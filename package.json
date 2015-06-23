@@ -1,0 +1,31 @@
+{
+  "name": "AC-socialAPI",
+  "version": "0.0.0",
+  "description": "Avenue Code Training code",
+  "main": "index.js",
+  "scripts": {
+    "preinstall": "npm install grunt-cli -g",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andrebot/AC-socialApi.git"
+  },
+  "keywords": [
+    "Node",
+    "Express"
+  ],
+  "author": "Andre Botelho",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andrebot/AC-socialApi/issues"
+  },
+  "homepage": "https://github.com/andrebot/AC-socialApi",
+  "dependencies": {
+    "express": "^4.13.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-nodemon": "^0.4.0"
+  }
+}
