@@ -28,7 +28,13 @@ Run Server
 
   To run the server you just have to execute:
   `$ grunt serverExpress`
-  
+
+Interacting With API
+--------------------
+
+  After you have set up the server and executed `$ grunt serverExpress`, you can access http://localhost:3000 and use
+  the interface to test responses and behavior. (This code is in 'serverExpress/public/index.html').
+
 Endpoints Available
 -------------------
 
