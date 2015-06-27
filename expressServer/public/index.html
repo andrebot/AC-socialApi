@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>Node Course</title>
+
+  <style type="text/css">
+    .requestsResultsHolder {
+      margin-bottom: 10px;
+    }
+
+    .requestResult {
+      border: 1px solid #000000;
+      min-height: 10px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="requestsResultsHolder">
+    <h1>Response From <span id="requester"></span></h1>
+    <div class="requestResult">
+    </div>
+  </div>
+
+  <div class="requestHolder">
+    <h1>Available Requests:</h1>
+    <div>
+      <span>User ID:</span> <input type="text" id="userId"/>
+      <span>Query:</span> <input type="text" id="queryUserName"/>
+    </div>
+    <button onclick="listAllUsers()">List All Users</button>
+    <button onclick="getMe()">Get Current Logged User</button>
+    <button onclick="getUserById()">Get User by ID</button>
+    <button onclick="searchByName()">Search User By Name</button>
+    <button onclick="deleteUserById()">Delete User By ID</button>
+    <div>
+      <h2>Login</h2>
+      <form id="login" action="/login">
+        <label>User:</label><input type="text" name="username"/>
+        <label>Password:</label><input type="password" name="password"/>
+        <button type="submit">Log In</button>
+      </form>
+      <button onclick="logout()">Log out</button>
+    </div>
+    <div>
+      <h2>Creating User</h2>
+      <form id="createUser" action="/users">
+        <div>
+          <label>Name:</label>
+          <input name="name" type="text"/>
+        </div>
+        <div>
+          <label>Email:</label>
+          <input name="email" type="email"/>
+        </div>
+        <div>
+          <label>Password:</label>
+          <input name="password" type="password"/>
+        </div>
+        <button type="submit">Create</button>
+      </form>
+    </div>
+    <div>
+      <h2>Change Password</h2>
+      <form id="changePassword" action="/users">
+        <div>
+          <label>User Id:</label>
+          <input id="passwordUserId" type="text"/>
+        </div>
+        <div>
+          <label>Old Password:</label>
+          <input name="oldPassword" type="password"/>
+        </div>
+        <div>
+          <label>New Password:</label>
+          <input name="newPassword" type="password"/>
+        </div>
+        <button type="submit">Change Password</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="lib/jquery.min.js"></script>
+  <script type="text/javascript" src="lib/jquery.cookie.js"></script>
+  <script type="application/javascript">
+
+    function makeAjaxCall(url, type, title, data) {
+      var options = {
+        method: type,
+        success: function(response) {
+          $('#requester').html(title);
+          try{
+            $('.requestResult').html(JSON.stringify(response));
+          } catch(error) {
+            $('.requestResult').html(response);
+          }
+
+        },
+        error:function(request, status, error) {
+          alert('An error has occured ' + error + '. Status: ' + status);
+        }
+      };
+
+      if(data) {
+        options.dataType = 'json';
+        options.data = data;
+      }
+      $.ajax(url, options);
+    };
+
+    function makeFormCall(form, event, type, title, url){
+      event.preventDefault();
+
+      var data = form.serialize();
+
+      if(!url){
+        url = form.attr("action");
+      }
+
+      makeAjaxCall(url, type, title, data);
+    }
+
+    function listAllUsers() {
+      makeAjaxCall('/users', 'GET', 'List All Users');
+    };
+
+    function getUserById() {
+      makeAjaxCall('/users/' + $('#userId').val(), 'GET', 'Get User By Id');
+    };
+
+    function searchByName() {
+      makeAjaxCall('/users?q=' + $('#queryUserName').val(), 'GET', 'Search User By name');
+    };
+
+    function deleteUserById() {
+      makeAjaxCall('/users/' + $('#userId').val(), 'DELETE', 'Delete User By Id');
+    };
+
+    function updatePasswordById() {
+      makeAjaxCall('/users/' + $('#passwordUserId').val() + '/password', 'PUT', 'Update Password By Id');
+    };
+
+    function getMe() {
+      makeAjaxCall('/users/me', 'GET', 'Get Current Logged User');
+    }
+
+    function logout() {
+      if($.removeCookie('socialAPI')) {
+        $('#requester').html('Log Out.');
+        $('.requestResult').html('Logged Out.');
+      } else {
+        $('#requester').html('Log Out.');
+        $('.requestResult').html('Could not remove cookie.');
+      }
+
+    };
+
+    $('#login').submit(function(event){
+      event.preventDefault();
+
+      var options = {
+        method: 'POST',
+        dataType: 'json',
+        data: $(this).serialize(),
+        success: function(token) {
+          $('#requester').html('Log In');
+          $('.requestResult').html(token);
+
+          $.cookie('socialAPI', token);
+
+        },
+        error:function(request, status, error) {
+          alert('An error has occured ' + error + '. Status: ' + status);
+        }
+      };
+
+      $.ajax($(this).attr('action'), options);
+    });
+
+    $('#createUser').submit(function(event) {
+      makeFormCall($(this), event, 'POST', 'Create User');
+    });
+
+    $('#changePassword').submit(function(event) {
+      var form = $(this);
+      var url = form.attr("action") + '/' + $('#passwordUserId').val() + '/password';
+      makeFormCall(form, event, 'PUT', 'Change Password', url);
+    });
+  </script>
+</body>
+</html>
