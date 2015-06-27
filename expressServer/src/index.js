@@ -25,7 +25,7 @@ app.use('/users', users);
 app.use('/login', login);
 
 console.log('Initializing server...');
-var server = app.listen(3000, function(){
+var server = app.listen(3000, 'localhost', function(){
   var address = server.address();
 
   console.log('Listening at http://%s:%s...', address.address, address.port);
