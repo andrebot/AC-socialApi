@@ -46,5 +46,4 @@ TO-DO
 
   * Add Friend endpoints
   * Implement MongoDB
-  * Add a pure NodeJS server
   * Add Unit tests
