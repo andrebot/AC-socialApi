@@ -1,13 +1,13 @@
 Social API
 ==========
 
-This is the code example for AvenueCode Node and Express Course.
+  This is the code example for AvenueCode Node and Express Course.
 
 Installation
 ------------
 `npm install`
 
-This will install all the dependencies and grunt-cli (the last one as a global package).
+  This will install all the dependencies and grunt-cli (the last one as a global package).
 
 ###Dependencies
 
@@ -22,6 +22,12 @@ This will install all the dependencies and grunt-cli (the last one as a global p
   * grunt-nodemon
   * Jquery
   * Jquery-Cookie
+  
+Run Server
+----------
+
+  To run the server you just have to execute:
+  `$ grunt serverExpress`
   
 Endpoints Available
 -------------------
