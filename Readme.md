@@ -14,6 +14,7 @@ Installation
   * NodeJS
   * Express
   * body-parser
+  * bootstrap
   * cookie-parser
   * jsonwebtoken
   * Grunt

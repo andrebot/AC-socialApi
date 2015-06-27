@@ -3,8 +3,11 @@ module.exports = function(grunt) {
     copy: {
       uiLib: {
         files: [
-          {expand: true, flatten: true, src: ['node_modules/jquery/dist/*.min.*'], dest: 'expressServer/public/lib'},
-          {expand: true, flatten: true, src: ['node_modules/jquery.cookie/jquery.cookie.js'], dest: 'expressServer/public/lib'}
+          {expand: true, flatten: true, src: ['node_modules/jquery/dist/*.min.*'], dest: 'expressServer/public/lib/js'},
+          {expand: true, flatten: true, src: ['node_modules/jquery.cookie/jquery.cookie.js'], dest: 'expressServer/public/lib/js'},
+          {expand: true, flatten: true, src: ['node_modules/bootstrap/dist/js/bootstrap.min.js'], dest: 'expressServer/public/lib/js'},
+          {expand: true, flatten: true, src: ['node_modules/bootstrap/dist/fonts/*'], dest: 'expressServer/public/lib/fonts/'},
+          {expand: true, flatten: true, src: ['node_modules/bootstrap/dist/css/*.min.css'], dest: 'expressServer/public/lib/css/'}
         ]
       }
     },

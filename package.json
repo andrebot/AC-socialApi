@@ -28,6 +28,7 @@
     "jsonwebtoken": "^5.0.2"
   },
   "devDependencies": {
+    "bootstrap": "^3.3.5",
     "grunt": "^0.4.5",
     "grunt-contrib-copy": "^0.8.0",
     "grunt-nodemon": "^0.4.0",

@@ -4,85 +4,128 @@
   <meta charset="UTF-8">
   <title>Node Course</title>
 
+  <link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css"/>
   <style type="text/css">
-    .requestsResultsHolder {
+    .margin-bottom {
       margin-bottom: 10px;
     }
 
-    .requestResult {
-      border: 1px solid #000000;
-      min-height: 10px;
+    .affix.fix-right {
+      margin-left: 40%;
+    }
+
+    .wrap {
       word-break: break-all;
     }
   </style>
 </head>
 <body>
-  <div class="requestsResultsHolder">
-    <h1>Response From <span id="requester"></span></h1>
-    <div class="requestResult">
+
+  <div class="container-fluid">
+    <div class="col-md-5">
+      <div class="panel panel-default">
+        <div class="panel-heading">Available Requests</div>
+        <div class="panel-body">
+
+          <form class="form-inline margin-bottom">
+            <div class="form-group">
+              <label for="userId">UserId:</label>
+              <input type="text" name="userId" id="userId" class="form-control"/>
+            </div>
+            <div class="form-group">
+              <label for="queryUserName">Query:</label>
+              <input type="text" name="queryUserName" id="queryUserName" class="form-control"/>
+            </div>
+          </form>
+
+          <div class="well margin-bottom">
+            <button onclick="listAllUsers()" class="btn btn-primary btn-block">List All Users</button>
+            <button onclick="getMe()" class="btn btn-primary btn-block">Get Current Logged User</button>
+            <button onclick="getUserById()" class="btn btn-primary btn-block">Get User by ID</button>
+            <button onclick="searchByName()" class="btn btn-primary btn-block">Search User By Name</button>
+            <button onclick="deleteUserById()" class="btn btn-primary btn-block">Delete User By ID</button>
+          </div>
+
+          <h2 class="page-header">Login</h2>
+          <form class="form-horizontal margin-bottom" id="login" action="/login">
+            <div class="form-group">
+              <label for="username" class="col-md-2 control-label">User:</label>
+              <div class="col-md-10">
+                <input type="text" name="username" id="username" class="form-control"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="password" class="col-md-2 control-label">Password:</label>
+              <div class="col-md-10">
+                <input type="text" name="password" id="password" class="form-control"/>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary pull-right">Log In</button>
+          </form>
+          <button onclick="logout()" class="btn btn-primary margin-bottom">Log out</button>
+
+          <h2 class="page-header">Create User</h2>
+          <form class="form-horizontal margin-bottom" id="createUser" action="/users">
+            <div class="form-group">
+              <label for="name" class="col-md-2 control-label">Name:</label>
+              <div class="col-md-10">
+                <input type="text" name="name" id="name" class="form-control"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="email" class="col-md-2 control-label">Email:</label>
+              <div class="col-md-10">
+                <input type="text" name="email" id="email" class="form-control"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="password" class="col-md-2 control-label">Password:</label>
+              <div class="col-md-10">
+                <input type="password" name="password" class="form-control"/>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary pull-right">Create</button>
+          </form>
+
+          <h2 class="page-header">Change Password</h2>
+          <form class="form-horizontal margin-bottom" id="changePassword" action="/users">
+            <div class="form-group">
+              <label for="passwordUserId" class="col-md-4 control-label">User ID:</label>
+              <div class="col-md-8">
+                <input type="text" name="passwordUserId" id="passwordUserId" class="form-control"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="oldPassword" class="col-md-4 control-label">Old Password:</label>
+              <div class="col-md-8">
+                <input type="password" name="oldPassword" id="oldPassword" class="form-control"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="newPassword" class="col-md-4 control-label">New Password:</label>
+              <div class="col-md-8">
+                <input type="password" name="newPassword" id="newPassword" class="form-control"/>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary pull-right">Change</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7 affix fix-right" data-spy="affix" data-offset-top="60">
+      <div class="panel panel-default">
+        <div class="panel-heading">Response From: <span id="requester"></span></div>
+        <div class="panel-body requestResult wrap">
+
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="requestHolder">
-    <h1>Available Requests:</h1>
-    <div>
-      <span>User ID:</span> <input type="text" id="userId"/>
-      <span>Query:</span> <input type="text" id="queryUserName"/>
-    </div>
-    <button onclick="listAllUsers()">List All Users</button>
-    <button onclick="getMe()">Get Current Logged User</button>
-    <button onclick="getUserById()">Get User by ID</button>
-    <button onclick="searchByName()">Search User By Name</button>
-    <button onclick="deleteUserById()">Delete User By ID</button>
-    <div>
-      <h2>Login</h2>
-      <form id="login" action="/login">
-        <label>User:</label><input type="text" name="username"/>
-        <label>Password:</label><input type="password" name="password"/>
-        <button type="submit">Log In</button>
-      </form>
-      <button onclick="logout()">Log out</button>
-    </div>
-    <div>
-      <h2>Creating User</h2>
-      <form id="createUser" action="/users">
-        <div>
-          <label>Name:</label>
-          <input name="name" type="text"/>
-        </div>
-        <div>
-          <label>Email:</label>
-          <input name="email" type="email"/>
-        </div>
-        <div>
-          <label>Password:</label>
-          <input name="password" type="password"/>
-        </div>
-        <button type="submit">Create</button>
-      </form>
-    </div>
-    <div>
-      <h2>Change Password</h2>
-      <form id="changePassword" action="/users">
-        <div>
-          <label>User Id:</label>
-          <input id="passwordUserId" type="text"/>
-        </div>
-        <div>
-          <label>Old Password:</label>
-          <input name="oldPassword" type="password"/>
-        </div>
-        <div>
-          <label>New Password:</label>
-          <input name="newPassword" type="password"/>
-        </div>
-        <button type="submit">Change Password</button>
-      </form>
-    </div>
-  </div>
-
-  <script type="text/javascript" src="lib/jquery.min.js"></script>
-  <script type="text/javascript" src="lib/jquery.cookie.js"></script>
+  <script type="text/javascript" src="lib/js/jquery.min.js"></script>
+  <script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="lib/js/jquery.cookie.js"></script>
   <script type="application/javascript">
 
     function makeAjaxCall(url, type, title, data) {
