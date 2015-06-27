@@ -56,6 +56,6 @@ Auth
 TO-DO
 -----
 
-  * Add Friend endpoints
+  * Add Friend endpoints (https://github.com/hcbelias/socialnetwork/tree/release)
   * Implement MongoDB
   * Add Unit tests
