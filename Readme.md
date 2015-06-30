@@ -11,23 +11,23 @@ Installation
 
 ###Dependencies
 
-  * NodeJS
-  * Express
-  * body-parser
-  * blanket
-  * bootstrap
-  * cookie-parser
-  * jsonwebtoken
-  * Grunt
-  * grunt-cli
-  * grunt-contrib-copy
-  * grunt-mocha-test
-  * grunt-nodemon
-  * Jquery
-  * Jquery-Cookie
-  * mocha
-  * should
-  * supertest
+  * [NodeJS](https://nodejs.org/)
+  * [Express](https://github.com/strongloop/express)
+  * [body-parser](https://github.com/expressjs/body-parser)
+  * [blanket](https://github.com/alex-seville/blanket)
+  * [bootstrap](https://github.com/twbs/bootstrap)
+  * [cookie-parser](https://github.com/expressjs/cookie-parser)
+  * [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken)
+  * [Grunt](http://gruntjs.com/)
+  * [grunt-cli](https://github.com/gruntjs/grunt-cli)
+  * [grunt-contrib-copy](https://github.com/gruntjs/grunt-contrib-copy)
+  * [grunt-mocha-test](https://github.com/pghalliday/grunt-mocha-test)
+  * [grunt-nodemon](https://github.com/ChrisWren/grunt-nodemon)
+  * [Jquery](https://github.com/jquery/jquery)
+  * [Jquery-Cookie](https://github.com/carhartl/jquery-cookie)
+  * [mocha](http://mochajs.org/)
+  * [should](https://github.com/shouldjs/should.js)
+  * [supertest](https://github.com/visionmedia/supertest)
   
 Run Server
 ----------
@@ -38,7 +38,7 @@ Run Server
 Interacting With API
 --------------------
 
-  After you have set up the server and executed `$ grunt serverExpress`, you can access http://localhost:3000 and use
+  After you have set up the server and executed `$ grunt serverExpress`, you can access **http://localhost:3000** and use
   the interface to test responses and behavior. (This code is in 'serverExpress/public/index.html').
 
 Endpoints Available
