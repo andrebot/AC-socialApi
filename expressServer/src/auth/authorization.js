@@ -3,7 +3,7 @@ var jwt = require('jsonwebtoken');
 
 var Auth = function() {
   var verifyAuth = function(request) {
-    var cookie = request.cookies.socialAPI;
+    var cookie = request.cookies[config.cookieName];
     if(cookie) {
       try {
         request.token = jwt.verify(cookie, config.secret, {issuer: config.issuer, ignoreExpiration: false});

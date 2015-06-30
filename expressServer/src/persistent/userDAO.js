@@ -43,7 +43,7 @@ var User = function(name, email, password) {
 var UserDAO = function(){
 
   this.getUser = function(id) {
-    return users[id];
+    return (users.length > id) ? users[id] : {};
   };
 
   this.listAllUsers = function() {
@@ -74,6 +74,7 @@ var UserDAO = function(){
 
   this.changePassword = function(userId, oldPassword, newPassword) {
     var user = users[userId];
+
     if(user && user.password === oldPassword) {
       user.password = newPassword;
     }
@@ -90,7 +91,7 @@ var UserDAO = function(){
   };
 
   this.deleteUser = function(userId) {
-    return users.splice(userId, 1);
+    return  (users.length > userId) ? users.splice(userId, 1)[0] : {};
   };
 };
 

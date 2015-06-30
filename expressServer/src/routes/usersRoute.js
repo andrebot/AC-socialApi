@@ -37,40 +37,23 @@ router.route('/')
 router.route('/me')
   .get(auth.isAuthenticated, function(request, response){
     var token = request.token;
-    if(token) {
-      console.log('Getting user with #' + token._id);
-      response.status(200).json(userDAO.getUser(token._id));
-    } else {
-      var errorMsg = 'Could not get user. Missing token.';
-      console.log(errorMsg);
-      response.status(403).send(errorMsg);
-    }
+    console.log('Getting user with #' + token._id);
+    response.status(200).json(userDAO.getUser(token._id));
   });
 
 router.route('/:userId')
   .get(auth.isAuthenticated, function(request, response){
     var userId = request.params.userId;
 
-    if(userId) {
-      console.log('Getting User #' + userId);
-      response.status(200).json(userDAO.getUser(userId));
-    } else {
-      var errorMsg = 'Could not get user. Invalid ID: ' + userId;
-      console.log(errorMsg);
-      response.status(403).send(errorMsg);
-    }
+    console.log('Getting User #' + userId);
+    response.status(200).json(userDAO.getUser(userId));
+
   })
   .delete(auth.hasRole('admin'), function(request, response){
     var userId = request.params.userId;
 
-    if(userId) {
-      console.log('Deleting User #' + userId);
-      response.status(200).json(userDAO.deleteUser(userId));
-    } else {
-      var errorMsg = 'Could not delete user. User ID missing.';
-      console.log(errorMsg);
-      response.status(403).send(errorMsg);
-    }
+    console.log('Deleting User #' + userId);
+    response.status(200).json(userDAO.deleteUser(userId));
   });
 
 router.route('/:userId/password')
@@ -81,8 +64,14 @@ router.route('/:userId/password')
     if(userId && data && data.oldPassword && data.newPassword) {
       console.log('Changing User Password.');
       var user = userDAO.changePassword(userId, data.oldPassword, data.newPassword);
-      console.log('Password changed.');
-      response.status(200).json({msg:'Password changed successfully'});
+      if(user.password === data.newPassword){
+        console.log('Password changed.');
+        response.status(200).json({msg:'Password changed successfully'});
+      } else {
+        var errorMsg = 'Password did not change. Current password does not match.';
+        console.log(errorMsg);
+        response.status(403).send(errorMsg);
+      }
     } else {
       var errorMsg = 'Could not change user\'s password. Wrong data.';
       console.log(errorMsg);

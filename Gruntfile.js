@@ -19,11 +19,30 @@ module.exports = function(grunt) {
           cwd: 'expressServer/src'
         }
       }
+    },
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec',
+          require: 'blanketWrapper'
+        },
+        src: ['expressServer/tests/*.js']
+      },
+      coverage: {
+        options: {
+          reporter: 'html-cov',
+          quiet: true,
+          captureFile: 'coverage.html'
+        },
+        src: ['expressServer/tests/*.js']
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-nodemon');
-  grunt.loadNpmTasks('grunt-contrib-copy')
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
   grunt.registerTask('serverExpress', ['copy', 'nodemon:express']);
+  grunt.registerTask('testExpressServer', ['mochaTest']);
 };

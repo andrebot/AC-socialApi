@@ -14,15 +14,20 @@ Installation
   * NodeJS
   * Express
   * body-parser
+  * blanket
   * bootstrap
   * cookie-parser
   * jsonwebtoken
   * Grunt
   * grunt-cli
   * grunt-contrib-copy
+  * grunt-mocha-test
   * grunt-nodemon
   * Jquery
   * Jquery-Cookie
+  * mocha
+  * should
+  * supertest
   
 Run Server
 ----------
@@ -54,9 +59,14 @@ Auth
 
   Authorization/Authentication is done using token, by JWT.
   
+Test
+----
+
+  We are using [mocha](http://mochajs.org/), [supertest](https://github.com/visionmedia/supertest) and 
+  [should](https://github.com/shouldjs/should.js) to do Unit Testing. We also added blanket as a coverage tool
+  
 TO-DO
 -----
 
   * Add Friend endpoints (https://github.com/hcbelias/socialnetwork/tree/release)
   * Implement MongoDB
-  * Add Unit tests
