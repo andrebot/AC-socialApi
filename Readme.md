@@ -63,7 +63,8 @@ Test
 ----
 
   We are using [mocha](http://mochajs.org/), [supertest](https://github.com/visionmedia/supertest) and 
-  [should](https://github.com/shouldjs/should.js) to do Unit Testing. We also added blanket as a coverage tool
+  [should](https://github.com/shouldjs/should.js) to do Unit Testing. We also added 
+  [blanket](https://github.com/alex-seville/blanket) as a coverage tool
   
 TO-DO
 -----
