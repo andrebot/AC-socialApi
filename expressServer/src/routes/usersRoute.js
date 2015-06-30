@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var auth = require('../auth/authorization');
-var userDAO = require('../persistent/userDAO');
+var userDAO = require('../persistent/userMongoDAO');
 
 console.log('Initializing user routes.');
 
