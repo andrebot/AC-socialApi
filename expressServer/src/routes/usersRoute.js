@@ -48,14 +48,19 @@ router.route('/:userId')
     var userId = request.params.userId;
 
     console.log('Getting User #' + userId);
-    response.status(200).json(userDAO.getUser(userId));
-
+    var promise = userDAO.getUser(userId);
+    promise.then(function(user){
+      response.status(200).json(user);
+    });
   })
   .delete(auth.hasRole('admin'), function(request, response){
     var userId = request.params.userId;
 
     console.log('Deleting User #' + userId);
-    response.status(200).json(userDAO.deleteUser(userId));
+    var promise = userDAO.deleteUser(userId);
+    promise.then(function(user){
+      response.status(200).json(user);
+    });
   });
 
 router.route('/:userId/password')
@@ -65,15 +70,17 @@ router.route('/:userId/password')
 
     if(userId && data && data.oldPassword && data.newPassword) {
       console.log('Changing User Password.');
-      var user = userDAO.changePassword(userId, data.oldPassword, data.newPassword);
-      if(user.password === data.newPassword){
-        console.log('Password changed.');
-        response.status(200).json({msg:'Password changed successfully'});
-      } else {
-        var errorMsg = 'Password did not change. Current password does not match.';
-        console.log(errorMsg);
-        response.status(403).send(errorMsg);
-      }
+      var promise = userDAO.changePassword(userId, data.oldPassword, data.newPassword);;
+      promise.then(function(user){
+        if(user){
+          console.log('Password changed.');
+          response.status(200).json({msg:'Password changed successfully'});
+        } else {
+          var errorMsg = 'Password did not change. Current password does not match.';
+          console.log(errorMsg);
+          response.status(403).send(errorMsg);
+        }
+      });      
     } else {
       var errorMsg = 'Could not change user\'s password. Wrong data.';
       console.log(errorMsg);

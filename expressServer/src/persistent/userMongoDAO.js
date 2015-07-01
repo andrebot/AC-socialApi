@@ -37,12 +37,10 @@ var UserDAO = function(){
   };
 
   this.changePassword = function(userId, oldPassword, newPassword) {
-    console.log('MongoDB - changePassword - findById()');
-    User.findById(userId, function (err, user) {
-      if(user && user.password === oldPassword) {
-        user.password = newPassword;
-      }
-    });
+    console.log('MongoDB - changePassword - findOneAndUpdate()');
+    debugger;
+    var query = User.findOneAndUpdate({ '_id': userId, 'password': oldPassword }, { $set: { password: newPassword } }, { 'new': true });
+    return query.exec();
   };
 
   this.createUser = function(name, email, password){
@@ -56,7 +54,8 @@ var UserDAO = function(){
 
   this.deleteUser = function(userId) {	  
     console.log('MongoDB - User deleted - findOneAndRemove()');
-    User.findOneAndRemove(userId);
+    var query = User.findOneAndRemove(userId);
+    return query.exec();
   };
 };
 
