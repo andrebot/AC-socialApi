@@ -8,21 +8,20 @@ console.log('Initializing user routes.');
 router.route('/')
   .get(auth.isAuthenticated, function(request, response){
     var search = request.query.q;
-    var users;
-
+    var promise;
     if(search) {
       console.log('Getting users by name using query = ' + search);
-      users = userDAO.searchUsersByName(search);
+      promise = userDAO.searchUsersByName(search);
     } else {
       console.log('Getting all users.');
-      users = userDAO.listAllUsers();
+      promise = userDAO.listAllUsers();
     }
-
-    response.status(200).json(users);
+    promise.then(function(users){
+      response.status(200).json(users);
+    });
   })
   .post(function(request, response){
     var data = request.body;
-
     if(data && data.name && data.email && data.password) {
       console.log('Creating new user.');
       var newUser = userDAO.createUser(data.name, data.email, data.password);
@@ -38,7 +37,10 @@ router.route('/me')
   .get(auth.isAuthenticated, function(request, response){
     var token = request.token;
     console.log('Getting user with #' + token._id);
-    response.status(200).json(userDAO.getUser(token._id));
+    var promise = userDAO.getUser(token._id);
+    promise.then(function(user){
+      response.status(200).json(user);
+    });
   });
 
 router.route('/:userId')
