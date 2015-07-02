@@ -1,12 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var auth = require('../auth/authorization');
-var userDAO = require('../persistent/userDAO');
+var userDAO = require('../../persistent/userDAO');
 
-console.log('Initializing user routes.');
-
-router.route('/')
-  .get(auth.isAuthenticated, function(request, response){
+var UserController = function () {
+  this.listUsers = function(request, response) {
     var search = request.query.q;
     var users;
 
@@ -19,8 +14,9 @@ router.route('/')
     }
 
     response.status(200).json(users);
-  })
-  .post(function(request, response){
+  };
+
+  this.createUser = function(request, response) {
     var data = request.body;
 
     if(data && data.name && data.email && data.password) {
@@ -32,32 +28,29 @@ router.route('/')
       console.log('Error creating User.');
       response.status(403).send('Could not create user. Data malformed.');
     }
-  });
+  };
 
-router.route('/me')
-  .get(auth.isAuthenticated, function(request, response){
+  this.getLoggedUser = function(request, response) {
     var token = request.token;
     console.log('Getting user with #' + token._id);
     response.status(200).json(userDAO.getUser(token._id));
-  });
+  };
 
-router.route('/:userId')
-  .get(auth.isAuthenticated, function(request, response){
+  this.getUser = function(request, response) {
     var userId = request.params.userId;
 
     console.log('Getting User #' + userId);
     response.status(200).json(userDAO.getUser(userId));
+  };
 
-  })
-  .delete(auth.hasRole('admin'), function(request, response){
+  this.deleteUser = function(request, response) {
     var userId = request.params.userId;
 
     console.log('Deleting User #' + userId);
     response.status(200).json(userDAO.deleteUser(userId));
-  });
+  };
 
-router.route('/:userId/password')
-  .put(auth.isAuthenticated, function(request, response){
+  this.changePassword = function(request, response) {
     var userId = request.params.userId;
     var data = request.body;
 
@@ -77,6 +70,7 @@ router.route('/:userId/password')
       console.log(errorMsg);
       response.status(403).send(errorMsg);
     }
-  });
+  };
+};
 
-module.exports = router;
+module.exports = new UserController();
