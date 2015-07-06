@@ -24,7 +24,7 @@ var UserSchema = new Schema({
 UserSchema
   .path('email')
   .validate(function(email) {
-    return email.length;
+    return email.length > 0;
   }, 'Email cannot be blank');
 
 // Validate empty password

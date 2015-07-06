@@ -9,8 +9,8 @@ var bodyParser = require('body-parser');
 //Middleware for parsing cookies
 var cookieParser = require('cookie-parser');
 //Instantiating routes
-var users = require('./routes/usersRoute');
-var login = require('./routes/loginRoute');
+var users = require('./routes/users/userRouting');
+var login = require('./routes/login/loginRouting');
 
 var mongoose = require('mongoose');
 
