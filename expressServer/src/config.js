@@ -6,7 +6,7 @@ module.exports = {
   cookieName:'socialAPI',
   tokenExpiration: 60*5,
   mongo: {
-	  uri: 'mongodb://localhost:27017/social',
+	  uri: 'mongodb://acsocial:ac4success@ds047478.mongolab.com:47478/social',
 	  options: {
 		  db: {
 			safe: true
