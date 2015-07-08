@@ -5,7 +5,13 @@ var jwt = require('jsonwebtoken');
 
 describe('Users Route', function() {
   var server;
-  var adminUser = {_id: 0, role: 'admin'};
+  var adminUser = { 
+    "_id": 0,
+    "email": "andrebot_almeida@hotmail.com",
+    "password": "theasdf123",
+    "name": "andre",
+    "role": "admin"
+  };
   var serverConfig = serverObject.getServerConfig();
   var url = 'http://' + serverConfig.host + ':' + serverConfig.port;
   request = request(url);
@@ -65,7 +71,7 @@ describe('Users Route', function() {
         var user = response.body;
 
         user.should.not.be.empty;
-        user.should.have.properties('name', 'email', 'id');
+        user.should.have.properties('name', 'email');
 
         done();
       });
@@ -84,8 +90,8 @@ describe('Users Route', function() {
         var user = response.body;
 
         user.should.not.be.empty;
-        user.should.have.properties('name', 'email', 'id');
-        user.should.have.property('id', idToTest);
+        user.should.have.properties('name', 'email', '_id');
+        user.should.have.property('_id', idToTest);
 
         done();
       });

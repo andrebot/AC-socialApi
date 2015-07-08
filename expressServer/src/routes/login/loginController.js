@@ -9,7 +9,6 @@ var LoginController = function () {
       console.log('Loging user ' + data.username);
       var promise = userDAO.getUserByEmailAndPassword(data.username, data.password);
 	  promise.then(function(user, error){
-	  	debugger;
 	    if(user){
 		  var payload = {_id: user.id, role: user.role};
 		  var token = auth.signToken(payload);
@@ -22,7 +21,10 @@ var LoginController = function () {
 		}
       });
     }else{
-    	response.status(403).send('required data not filled')
+    	var errorMsg = 'required data not filled';
+    	console.log(errorMsg);
+    	console.log(data);
+    	response.status(403).send(errorMsg)
     }
   };
   

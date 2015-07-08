@@ -5,7 +5,7 @@ var User = require('./../schema/user.schema')
 var UserDAO = function(){
 
   this.getUser = function(id) {
-    console.log('MongoDB - Get User - findById()');
+    console.log('MongoDB - Get User - findById('+ id+ ')');
     var query = User.findById(id);
 	  return query.exec();
   };
