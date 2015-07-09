@@ -10,7 +10,7 @@ var LoginController = function () {
       var promise = userDAO.getUserByEmailAndPassword(data.username, data.password);
 	  promise.then(function(user, error){
 	    if(user){
-		  var payload = {_id: user.id, role: user.role};
+		  var payload = {_id: user._id, role: user.role};
 		  var token = auth.signToken(payload);
 		  console.log('Returning token');
 		  response.status(200).json(token);

@@ -31,7 +31,7 @@ var UserDAO = function(){
   };
 
   this.getUserByEmailAndPassword = function(email, password) {
-    console.log('MongoDB - Get User by Email and Password - findOne() by email and password');
+    console.log('MongoDB - Get User by Email and Password - findOne() by email: ' + email + ' and password: ' + password);
     var query = User.findOne({ email: email, password: password});	
 	  return query.exec();
   };
