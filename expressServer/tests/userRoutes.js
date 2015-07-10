@@ -140,5 +140,27 @@ describe('Users Route', function() {
       });
   });
 
+  it('should create an user with I have the right data', function(done){
+    var newUser = {
+      name: 'testUser',
+      email: new Date().getTime() + 'test@tester.com',
+      password: 'meuPassword'
+    };
+
+    request.post('/users')
+      .send(newUser)
+      .expect(200)
+      .end(function(error, response){
+        if(error) return done(error);
+
+        var user = response.body;
+
+        user.should.not.be.empty;
+        user.should.have.properties(newUser);
+
+        done();
+      });
+  });
+
 
 });
