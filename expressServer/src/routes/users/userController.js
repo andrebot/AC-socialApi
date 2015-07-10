@@ -74,9 +74,16 @@ var UserController = function () {
     promise.then(function(data, err){
       console.log('data :  '+ data);
       console.log('err :  '+ err);
-      if(data && !err){
+      if(!err){
         console.log('Returning result: ' + data);
-        response.status(200).json(data);
+        if(data)
+        { 
+          response.status(200).json(data); 
+        }
+        else
+        {
+          response.status(200).json([]); 
+        }
       } else {      
         console.log(err);
         response.status(403).send({error: err, data: data});
