@@ -157,6 +157,9 @@ describe('Users Route', function() {
 
         user.should.not.be.empty;
         user.should.have.properties(newUser);
+        assert.equal(newUser.email, user.email);
+        assert.equal(newUser.name, user.name);
+        assert.equal(newUser.password, user.password);
 
         done();
       });
