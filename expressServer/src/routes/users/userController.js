@@ -54,10 +54,10 @@ var UserController = function () {
     var token = request.token;    
     console.log('Getting user with #' + token._id);
 
-    var promise = userDAO.getUser('559d8e75915c8c800a582180');
+    var promise = userDAO.getUser(token._id);
 
     promise.then(function(data, err){
-      console.log('eeeew');
+      
       if(data && !err){
         console.log('Returning result: ' + data);
         response.status(200).json(data);
@@ -73,8 +73,8 @@ var UserController = function () {
     var userId = request.params.userId;
     var promise = userDAO.getUser(userId);
     promise.then(function(data, err){
-      console.log(data);
-      console.log(err);
+      console.log('data :  '+ data);
+      console.log('err :  '+ err);
       if(data && !err){
         console.log('Returning result: ' + data);
         response.status(200).json(data);

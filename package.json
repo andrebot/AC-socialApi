@@ -38,6 +38,7 @@
     "jquery": "^2.1.4",
     "jquery.cookie": "^1.4.1",
     "mocha": "^2.2.5",
+    "mongodb": "^2.0.36",
     "should": "^7.0.1",
     "supertest": "^1.0.1"
   }
