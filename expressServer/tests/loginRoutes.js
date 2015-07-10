@@ -2,8 +2,11 @@ var serverObject = require('../src/server');
 var request = require('supertest');
 var should = require('should');
 var jwt = require('jsonwebtoken');
-var User = require('./../src/schema/user.schema')
-var testUser = new User({ 
+var User = require('./../src/schema/user.schema'),
+  Mongo = require('mongodb'),
+  ObjectID = Mongo.ObjectID,
+  assert = require("assert"),
+  testUser = new User({ 
   "email": "admin@mail.com",
   "password": "test",
   "name": "test",

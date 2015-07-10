@@ -5,9 +5,9 @@ var serverObject = require('../src/server'),
   User = require('./../src/schema/user.schema'),
   Mongo = require('mongodb'),
   ObjectID = Mongo.ObjectID,
-  assert = require("assert")
+  assert = require("assert"),
   userData = { 
-    "_id": new ObjectID("559fd352e4b04009d424521e"),  
+    "_id": new ObjectID("55a00ecd372da77256dfe45a"),  
     "email": "admin@mail.com",
     "password": "test",
     "name": "test",
@@ -15,7 +15,7 @@ var serverObject = require('../src/server'),
   }, 
   testUser = new User(userData),
   validAdminPayload = {
-    "_id": testUser._id,  
+    "_id": userData._id,  
     "role": testUser.role
   };
 
@@ -74,7 +74,7 @@ describe('Users Route', function() {
 
   it('should get current logged user using right cookie', function(done){
     
-       var token = getToken(validAdminPayload);
+    var token = getToken(validAdminPayload);
 
     request.get('/users/me')
       .set('Cookie', [serverConfig.cookieName + '=' + token])
@@ -87,7 +87,7 @@ describe('Users Route', function() {
         user.should.not.be.empty;
         user.should.have.properties('name', 'email', '_id', 'role', 'password');
         assert.equal("test", user.name);
-        assert.equal("559fd352e4b04009d424521e", user._id);
+        assert.equal(userData._id, user._id);
         assert.equal("admin", user.role);
         assert.equal("admin@mail.com", user.email);
         assert.equal("test", user.password);
@@ -110,7 +110,7 @@ describe('Users Route', function() {
         user.should.not.be.empty;
         user.should.have.properties('name', 'email', '_id', 'role', 'password');
         assert.equal("test", user.name);
-        assert.equal("559fd352e4b04009d424521e", user._id);
+        assert.equal(userData._id, user._id);
         assert.equal("admin", user.role);
         assert.equal("admin@mail.com", user.email);
         assert.equal("test", user.password);
@@ -164,6 +164,7 @@ describe('Users Route', function() {
         done();
       });
   });
+
 
 
 });

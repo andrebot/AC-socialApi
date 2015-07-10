@@ -17,10 +17,9 @@ var UserController = function () {
 
 	  promise.then(function(data, err){
       if(data && !err){
-        console.log('Returning result: ' + data);
         response.status(200).json(data);
       } else {      
-        console.log(err);
+        console.log('Err: ' + err);
         response.status(403).send({error: errorMsg, data: data});
       }    
     });
@@ -93,6 +92,9 @@ var UserController = function () {
     var promise = userDAO.deleteUser(userId);
     
     promise.then(function(data, err){
+      if(userId != data._id){
+        console.log('error: '+ userId + '   - data : ' + data._id);
+      }
       if(data && !err){
         console.log('Returning result: ' + data);
         response.status(200).json(data);

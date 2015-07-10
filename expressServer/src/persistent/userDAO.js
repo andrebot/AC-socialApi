@@ -57,7 +57,7 @@ var UserDAO = function(){
   };
 
   this.deleteUser = function(userId) {	  
-    console.log('MongoDB - User deleted - findOneAndRemove()');
+    console.log('MongoDB - User deleted - findOneAndRemove(' + userId + ')');
     var query = User.findOneAndRemove(userId);
     return query.exec();
   };
