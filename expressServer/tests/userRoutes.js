@@ -7,9 +7,8 @@ var Mongo = require('mongodb');
 var ObjectID = Mongo.ObjectID;
 var assert = require("assert");
 
-var validId = new ObjectID("559fd352e4b04009d424521e");
 var testUser = new User({ 
-  "_id": validId,  
+  "_id": new ObjectID("559fd352e4b04009d424521e"),  
   "email": "admin@mail.com",
   "password": "test",
   "name": "test",
@@ -17,8 +16,8 @@ var testUser = new User({
 });
 
 var validAdminPayload = {
-  "_id": validId,  
-  "role": "admin"
+  "_id": testUser._id,  
+  "role": testUser.role
 };
 
 
@@ -75,7 +74,7 @@ describe('Users Route', function() {
   });
 
   it('should get current logged user using right cookie', function(done){
-    console.log(JSON.stringify(validAdminPayload));
+    
        var token = getToken(validAdminPayload);
 
     request.get('/users/me')
@@ -87,13 +86,38 @@ describe('Users Route', function() {
         var user = response.body;
 
         user.should.not.be.empty;
-        user.should.have.properties('name', 'email', '_id', 'role');
+        user.should.have.properties('name', 'email', '_id', 'role', 'password');
         assert.equal("test", user.name);
         assert.equal("559fd352e4b04009d424521e", user._id);
         assert.equal("admin", user.role);
         assert.equal("admin@mail.com", user.email);
+        assert.equal("test", user.password);
         done();
       });
   });
+  
+  it('should get user with id ' + testUser._id  +' using right cookie', function(done){
+    var token = getToken(validAdminPayload);
+    var idToTest = testUser._id;
+
+    request.get('/users/' + idToTest)
+      .set('Cookie', [serverConfig.cookieName + '=' + token])
+      .expect(200)
+      .end(function(error, response){
+        if(error) return done(error);
+
+        var user = response.body;
+
+        user.should.not.be.empty;
+        user.should.have.properties('name', 'email', '_id', 'role', 'password');
+        assert.equal("test", user.name);
+        assert.equal("559fd352e4b04009d424521e", user._id);
+        assert.equal("admin", user.role);
+        assert.equal("admin@mail.com", user.email);
+        assert.equal("test", user.password);
+        done();
+      });
+  });
+
 
 });
