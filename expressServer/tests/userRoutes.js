@@ -1,24 +1,23 @@
-var serverObject = require('../src/server');
-var request = require('supertest');
-var should = require('should');
-var jwt = require('jsonwebtoken');
-var User = require('./../src/schema/user.schema');
-var Mongo = require('mongodb');
-var ObjectID = Mongo.ObjectID;
-var assert = require("assert");
-
-var testUser = new User({ 
-  "_id": new ObjectID("559fd352e4b04009d424521e"),  
-  "email": "admin@mail.com",
-  "password": "test",
-  "name": "test",
-  "role": "admin"
-});
-
-var validAdminPayload = {
-  "_id": testUser._id,  
-  "role": testUser.role
-};
+var serverObject = require('../src/server'),
+  request = require('supertest'),
+  should = require('should'),
+  jwt = require('jsonwebtoken'),
+  User = require('./../src/schema/user.schema'),
+  Mongo = require('mongodb'),
+  ObjectID = Mongo.ObjectID,
+  assert = require("assert")
+  userData = { 
+    "_id": new ObjectID("559fd352e4b04009d424521e"),  
+    "email": "admin@mail.com",
+    "password": "test",
+    "name": "test",
+    "role": "admin"
+  }, 
+  testUser = new User(userData),
+  validAdminPayload = {
+    "_id": testUser._id,  
+    "role": testUser.role
+  };
 
 
 
@@ -115,6 +114,28 @@ describe('Users Route', function() {
         assert.equal("admin", user.role);
         assert.equal("admin@mail.com", user.email);
         assert.equal("test", user.password);
+        done();
+      });
+  });
+
+
+  it('should list all users that its name have \'te\' if I have the right cookie', function(done){
+    var token = getToken(validAdminPayload);
+
+    request.get('/users?q=te')
+      .set('Cookie', [serverConfig.cookieName + "=" + token])
+      .expect(200)
+      .end(function(error, response){
+        if(error) return done(error);
+
+        var users = response.body;
+        users.should.not.be.empty;
+        users.should.be.an.Array;
+        users.should.matchEach(function(user){
+          user.should.have.property('name');
+          user.name.should.match(/te/i);
+        });
+
         done();
       });
   });
