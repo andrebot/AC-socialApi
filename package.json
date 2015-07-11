@@ -1,7 +1,7 @@
 {
   "name": "AC-socialAPI",
   "version": "0.0.0",
-  "description": "Avenue Code Training code",
+  "description": "Avenue Code Training Code",
   "main": "index.js",
   "scripts": {
     "preinstall": "npm install grunt-cli -g",
@@ -15,7 +15,7 @@
     "Node",
     "Express"
   ],
-  "author": "Andre Botelho",
+  "author": "Andre Botelho, Henrique Elias",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/andrebot/AC-socialApi/issues"
