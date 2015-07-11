@@ -100,4 +100,3 @@ TO-DO
 -----
 
   * Add Friend endpoints (https://github.com/hcbelias/socialnetwork/tree/release)
-  * Implement MongoDB
