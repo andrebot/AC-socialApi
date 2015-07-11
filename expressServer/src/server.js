@@ -12,6 +12,10 @@ var cookieParser = require('cookie-parser');
 var users = require('./routes/users/userRouting');
 var login = require('./routes/login/loginRouting');
 
+var mongoose = require('mongoose');
+
+mongoose.connect(config.mongo.uri, config.mongo.options);
+
 console.log('Making public folder public...');
 app.use(express.static('../public'));
 

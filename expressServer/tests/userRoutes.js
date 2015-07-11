@@ -1,16 +1,34 @@
-var serverObject = require('../src/server');
-var request = require('supertest');
-var should = require('should');
-var jwt = require('jsonwebtoken');
+var serverObject = require('../src/server'),
+  request = require('supertest'),
+  should = require('should'),
+  jwt = require('jsonwebtoken'),
+  User = require('./../src/schema/user.schema'),
+  Mongo = require('mongodb'),
+  ObjectID = Mongo.ObjectID,
+  assert = require("assert"),
+  userData = { 
+    "_id": new ObjectID("55a00ecd372da77256dfe45a"),  
+    "email": "admin@mail.com",
+    "password": "test",
+    "name": "test",
+    "role": "admin"
+  }, 
+  testUser = new User(userData),
+  validAdminPayload = {
+    "_id": userData._id,  
+    "role": testUser.role
+  };
+
+
 
 describe('Users Route', function() {
   var server;
-  var adminUser = {_id: 0, role: 'admin'};
   var serverConfig = serverObject.getServerConfig();
   var url = 'http://' + serverConfig.host + ':' + serverConfig.port;
   request = request(url);
 
   var getToken = function(payload){
+
     return jwt.sign(payload,
       serverConfig.secret,
       {
@@ -28,6 +46,7 @@ describe('Users Route', function() {
       });
   };
 
+
   beforeEach(function (done) {
     server = serverObject.makeServer(done);
   });
@@ -37,7 +56,7 @@ describe('Users Route', function() {
   });
 
   it('should list all users if I have the right cookie', function(done){
-    var token = getToken(adminUser);
+    var token = getToken(validAdminPayload);
 
     request.get('/users')
       .set('Cookie', [serverConfig.cookieName + '=' + token])
@@ -54,7 +73,8 @@ describe('Users Route', function() {
   });
 
   it('should get current logged user using right cookie', function(done){
-    var token = getToken(adminUser);
+    
+    var token = getToken(validAdminPayload);
 
     request.get('/users/me')
       .set('Cookie', [serverConfig.cookieName + '=' + token])
@@ -65,15 +85,19 @@ describe('Users Route', function() {
         var user = response.body;
 
         user.should.not.be.empty;
-        user.should.have.properties('name', 'email', 'id');
-
+        user.should.have.properties('name', 'email', '_id', 'role', 'password');
+        assert.equal("test", user.name);
+        assert.equal(userData._id, user._id);
+        assert.equal("admin", user.role);
+        assert.equal("admin@mail.com", user.email);
+        assert.equal("test", user.password);
         done();
       });
   });
-
-  it('should get user with id 0 using right cookie', function(done){
-    var token = getToken(adminUser);
-    var idToTest = 0;
+  
+  it('should get user with id ' + testUser._id  +' using right cookie', function(done){
+    var token = getToken(validAdminPayload);
+    var idToTest = testUser._id;
 
     request.get('/users/' + idToTest)
       .set('Cookie', [serverConfig.cookieName + '=' + token])
@@ -84,17 +108,21 @@ describe('Users Route', function() {
         var user = response.body;
 
         user.should.not.be.empty;
-        user.should.have.properties('name', 'email', 'id');
-        user.should.have.property('id', idToTest);
-
+        user.should.have.properties('name', 'email', '_id', 'role', 'password');
+        assert.equal("test", user.name);
+        assert.equal(userData._id, user._id);
+        assert.equal("admin", user.role);
+        assert.equal("admin@mail.com", user.email);
+        assert.equal("test", user.password);
         done();
       });
   });
 
-  it('should list all users that its name have \'an\' if I have the right cookie', function(done){
-    var token = getToken(adminUser);
 
-    request.get('/users?q=an')
+  it('should list all users that its name have \'te\' if I have the right cookie', function(done){
+    var token = getToken(validAdminPayload);
+
+    request.get('/users?q=te')
       .set('Cookie', [serverConfig.cookieName + "=" + token])
       .expect(200)
       .end(function(error, response){
@@ -104,8 +132,10 @@ describe('Users Route', function() {
         users.should.not.be.empty;
         users.should.be.an.Array;
         users.should.matchEach(function(user){
+          console.log('user: ' + JSON.stringify(user) );
           user.should.have.property('name');
-          user.name.should.match(/an/i);
+          user.should.have.property('email');
+          [ user.name, user.email].should.matchAny(/te/i);
         });
 
         done();
@@ -115,13 +145,13 @@ describe('Users Route', function() {
   it('should create an user with I have the right data', function(done){
     var newUser = {
       name: 'testUser',
-      email: 'test@tester.com',
+      email: new Date().getTime() + 'test@tester.com',
       password: 'meuPassword'
     };
 
     request.post('/users')
       .send(newUser)
-      .expect(201)
+      .expect(200)
       .end(function(error, response){
         if(error) return done(error);
 
@@ -129,59 +159,21 @@ describe('Users Route', function() {
 
         user.should.not.be.empty;
         user.should.have.properties(newUser);
+        assert.equal(newUser.email, user.email);
+        assert.equal(newUser.name, user.name);
+        assert.equal(newUser.password, user.password);
 
         done();
       });
   });
 
-  it('should delete an user with id 0 if I have the right cookie', function(done){
-    var token = getToken(adminUser);
-    var idToTest = 1;
-
-    request.delete('/users/' + idToTest)
-      .set('Cookie', [serverConfig.cookieName + "=" + token])
-      .expect(200)
-      .end(function(error, response){
-        if(error) return done(error);
-
-        var user = response.body;
-
-        user.should.not.be.empty;
-        user.should.have.properties('name', 'email', 'id');
-        user.should.have.property('id', idToTest);
-
-        done();
-      });
-  });
-
-  it('should change the user\'s password if I have the right credentials', function(done){
-    var token = getToken(adminUser);
-    var passwordData = {
-      oldPassword: 'theasdf123',
-      newPassword: 'hahahaha'
-    };
-
-    request.put('/users/'+ adminUser._id + '/password')
-      .set('Cookie', [serverConfig.cookieName + "=" + token])
-      .send(passwordData)
-      .expect(200)
-      .end(function(error, response){
-        if(error) return done(error);
-
-        var user = response.body;
-        user.should.not.be.empty;
-        user.should.have.property('msg');
-
-        done();
-      });
-  });
 
   it('should not list all users if I don\'t have a cookie', function(done){
     request.get('/users').expect(407, done);
   });
 
   it('should not list all users if I have an invalid cookie', function(done){
-    var token = getInvalidToken(adminUser);
+    var token = getInvalidToken(validAdminPayload);
 
     request.get('/users')
       .set('Cookie', [serverConfig.cookieName + "=" + token])
@@ -199,12 +191,12 @@ describe('Users Route', function() {
   });
 
   it('should get an empty object if there is no user with the ID requested', function(done){
-    var token = getToken(adminUser);
-    var idToTest = 2;
+    var token = getToken(validAdminPayload);
+    var idToTest = "55b00dcd372da77256dfe45a";
 
     request.get('/users/' + idToTest)
       .set('Cookie', [serverConfig.cookieName + '=' + token])
-      .expect(200)
+      
       .end(function(error, response){
         if(error) return done(error);
 
@@ -220,7 +212,7 @@ describe('Users Route', function() {
   });
 
   it('should return an empty array if nothing matches search parameter if I have the right cookie', function(done){
-    var token = getToken(adminUser);
+    var token = getToken(validAdminPayload);
 
     request.get('/users?q=shdajshdjahsgdjhasgdjahsgdajhsdgjashdg')
       .set('Cookie', [serverConfig.cookieName + "=" + token])
@@ -268,7 +260,7 @@ describe('Users Route', function() {
 
   it('should not delete an user if I not an admin', function(done){
     var token = getToken({_id: 1, role: 'user'});
-    var idToTest = 1;
+    var idToTest = userData._id;
 
     request.delete('/users/' + idToTest)
       .set('Cookie', [serverConfig.cookieName + "=" + token])
@@ -276,8 +268,8 @@ describe('Users Route', function() {
   });
 
   it('should not delete an user if I submitted wrong ID and should return an empty object', function(done){
-    var token = getToken(adminUser);
-    var idToTest = 1091898;
+    var token = getToken(validAdminPayload);
+    var idToTest = "55b00dcd372da77256dfe45a";
 
     request.delete('/users/' + idToTest)
       .set('Cookie', [serverConfig.cookieName + "=" + token])
@@ -305,34 +297,37 @@ describe('Users Route', function() {
       newPassword: 'hahahaha'
     };
 
-    request.put('/users/'+ adminUser._id + '/password')
+    request.put('/users/'+ validAdminPayload._id + '/password')
       .send(passwordData)
       .expect(407, done);
   });
 
   it('should not change the user\'s password if I the old password does not match the current password', function(done){
-    var token = getToken(adminUser);
+    var token = getToken(validAdminPayload);
     var passwordData = {
       oldPassword: 'errado',
       newPassword: 'pelotas'
     };
 
-    request.put('/users/'+ adminUser._id + '/password')
+    request.put('/users/'+ validAdminPayload._id + '/password')
       .set('Cookie', [serverConfig.cookieName + "=" + token])
       .send(passwordData)
       .expect(403, done);
   });
 
   it('should not change the user\'s password if I new password is missing', function(done){
-    var token = getToken(adminUser);
+    var token = getToken(validAdminPayload);
     var passwordData = {
       oldPassword: 'errado',
       newPassword: ''
     };
 
-    request.put('/users/'+ adminUser._id + '/password')
+    request.put('/users/'+ validAdminPayload._id + '/password')
       .set('Cookie', [serverConfig.cookieName + "=" + token])
       .send(passwordData)
       .expect(403, done);
   });
+
+
+
 });

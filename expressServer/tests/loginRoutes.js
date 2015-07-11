@@ -2,6 +2,17 @@ var serverObject = require('../src/server');
 var request = require('supertest');
 var should = require('should');
 var jwt = require('jsonwebtoken');
+var User = require('./../src/schema/user.schema'),
+  Mongo = require('mongodb'),
+  ObjectID = Mongo.ObjectID,
+  assert = require("assert"),
+  testUser = new User({ 
+  "email": "admin@mail.com",
+  "password": "test",
+  "name": "test",
+  "role": "admin"
+});
+
 
 describe('Login Route', function(){
   var server;
@@ -19,8 +30,8 @@ describe('Login Route', function(){
 
   it('should login successfully with right credentials', function(done){
     var user = {
-      username: 'andrebot_almeida@hotmail.com',
-      password: 'theasdf123'
+      username: testUser.email,
+      password: testUser.password
     };
 
     request.post('/login')

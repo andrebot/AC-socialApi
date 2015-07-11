@@ -1,53 +1,115 @@
 var userDAO = require('../../persistent/userDAO');
 
-var UserController = function () {
+
+var UserController = function () { 
+	
   this.listUsers = function(request, response) {
     var search = request.query.q;
-    var users;
+    var promise;
 
     if(search) {
       console.log('Getting users by name using query = ' + search);
-      users = userDAO.searchUsersByName(search);
+      promise = userDAO.searchUsersByName(search);
     } else {
       console.log('Getting all users.');
-      users = userDAO.listAllUsers();
+      promise = userDAO.listAllUsers();
     }
 
-    response.status(200).json(users);
+	  promise.then(function(data, err){
+      if(data && !err){
+        response.status(200).json(data);
+      } else {      
+        console.log('Err: ' + err);
+        response.status(403).send({error: errorMsg, data: data});
+      }    
+    });
+  
   };
 
   this.createUser = function(request, response) {
     var data = request.body;
+    console.log('Creating new user.');
+    if(data) {      
+      var promise = userDAO.createUser(data.name, data.email, data.password);
 
-    if(data && data.name && data.email && data.password) {
-      console.log('Creating new user.');
-      var newUser = userDAO.createUser(data.name, data.email, data.password);
-      console.log('User created');
-      response.status(201).json(newUser);
+      promise.then(function(data){
+        console.log('User created');
+        console.log('Returning result: ' + data);
+        response.status(200).json(data);   
+      }, function(err){
+        console.log(err);
+        response.status(403).send({error: err, data: data});
+      });
+      
+      
     } else {
       console.log('Error creating User.');
-      response.status(403).send('Could not create user. Data malformed.');
+      response.status(403).send({error: 'Could not create user. Data malformed.', data: data});
     }
   };
 
   this.getLoggedUser = function(request, response) {
-    var token = request.token;
+    
+    var token = request.token;    
     console.log('Getting user with #' + token._id);
-    response.status(200).json(userDAO.getUser(token._id));
+
+    var promise = userDAO.getUser(token._id);
+
+    promise.then(function(data, err){
+      
+      if(data && !err){
+        console.log('Returning result: ' + data);
+        response.status(200).json(data);
+      } else {      
+        console.log(err);
+        response.status(403).send({error: err, data: data});
+      }    
+    });
   };
 
   this.getUser = function(request, response) {
-    var userId = request.params.userId;
-
     console.log('Getting User #' + userId);
-    response.status(200).json(userDAO.getUser(userId));
+    var userId = request.params.userId;
+    var promise = userDAO.getUser(userId);
+    promise.then(function(data, err){
+      console.log('data :  '+ data);
+      console.log('err :  '+ err);
+      if(!err){
+        console.log('Returning result: ' + data);
+        if(data)
+        { 
+          response.status(200).json(data); 
+        }
+        else
+        {
+          response.status(200).json([]); 
+        }
+      } else {      
+        console.log(err);
+        response.status(403).send({error: err, data: data});
+      }    
+    });
   };
 
   this.deleteUser = function(request, response) {
     var userId = request.params.userId;
 
     console.log('Deleting User #' + userId);
-    response.status(200).json(userDAO.deleteUser(userId));
+    
+    var promise = userDAO.deleteUser(userId);
+    
+    promise.then(function(data, err){
+      if(userId != data._id){
+        console.log('error: '+ userId + '   - data : ' + data._id);
+      }
+      if(data && !err){
+        console.log('Returning result: ' + data);
+        response.status(200).json(data);
+      } else {      
+        console.log(err);
+        response.status(403).send({error: err, data: data});
+      }    
+    });
   };
 
   this.changePassword = function(request, response) {
@@ -56,19 +118,21 @@ var UserController = function () {
 
     if(userId && data && data.oldPassword && data.newPassword) {
       console.log('Changing User Password.');
-      var user = userDAO.changePassword(userId, data.oldPassword, data.newPassword);
-      if(user.password === data.newPassword){
-        console.log('Password changed.');
-        response.status(200).json({msg:'Password changed successfully'});
-      } else {
-        var errorMsg = 'Password did not change. Current password does not match.';
-        console.log(errorMsg);
-        response.status(403).send(errorMsg);
-      }
+      var promise = userDAO.changePassword(userId, data.oldPassword, data.newPassword);
+      promise.then(function(data, err){
+        if(data && !err){
+          console.log('Password changed.');
+          response.status(200).json(data);
+        } else {      
+          console.log(err);
+          response.status(403).send({error: err, data: data});
+        }    
+      });
+    
     } else {
       var errorMsg = 'Could not change user\'s password. Wrong data.';
       console.log(errorMsg);
-      response.status(403).send(errorMsg);
+      response.status(403).send({error: errorMsg, data: data});
     }
   };
 };

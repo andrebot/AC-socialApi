@@ -1,7 +1,7 @@
 {
   "name": "AC-socialAPI",
   "version": "0.0.0",
-  "description": "Avenue Code Training code",
+  "description": "Avenue Code Training Code",
   "main": "index.js",
   "scripts": {
     "preinstall": "npm install grunt-cli -g",
@@ -15,7 +15,7 @@
     "Node",
     "Express"
   ],
-  "author": "Andre Botelho",
+  "author": "Andre Botelho, Henrique Elias",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/andrebot/AC-socialApi/issues"
@@ -25,7 +25,9 @@
     "body-parser": "^1.13.1",
     "cookie-parser": "^1.3.5",
     "express": "^4.13.0",
-    "jsonwebtoken": "^5.0.2"
+    "jsonwebtoken": "^5.0.2",
+    "mongoose": "^4.0.6",
+    "mpromise": "^0.5.5"
   },
   "devDependencies": {
     "blanket": "^1.1.7",
@@ -37,6 +39,7 @@
     "jquery": "^2.1.4",
     "jquery.cookie": "^1.4.1",
     "mocha": "^2.2.5",
+    "mongodb": "^2.0.36",
     "should": "^7.0.1",
     "supertest": "^1.0.1"
   }
