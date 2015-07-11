@@ -26,6 +26,7 @@ Installation
   * [Jquery](https://github.com/jquery/jquery)
   * [Jquery-Cookie](https://github.com/carhartl/jquery-cookie)
   * [mocha](http://mochajs.org/)
+  * [mongoose](https://github.com/Automattic/mongoose)
   * [should](https://github.com/shouldjs/should.js)
   * [supertest](https://github.com/visionmedia/supertest)
   
@@ -69,23 +70,28 @@ Test
   Obs.: Windows users BE WARNED! To execute the grunt test task you need to perform a change in the blanket lib.
   In the file node_modules/blanket/src/index.js (lines 128-134) we have this code:
 
-  `//instrument js files
+  ```
+   //instrument js files
    require.extensions['.js'] = function(localModule, filename) {
      var pattern = blanket.options("filter"),
          reporter_options = blanket.options("reporter_options"),
          originalFilename = filename,
    		  inputFilename = filename;
-     filename = blanket.normalizeBackslashes(filename);`
+     filename = blanket.normalizeBackslashes(filename);
+  ```
 
   Please, kindly change it to:
 
-  `//instrument js files
+  ```
+   //instrument js files
    require.extensions['.js'] = function(localModule, filename) {
      var pattern = blanket.options("filter"),
          reporter_options = blanket.options("reporter_options"),
          originalFilename = filename,
    			 inputFilename = blanket.normalizeBackslashes(filename);
-     filename = inputFilename;`
+     filename = inputFilename;
+
+   ```
 
    Otherwise a exception will explode in the console because of windows path.
    [Blanket Issue 491](https://github.com/alex-seville/blanket/issues/491)
