@@ -4,15 +4,15 @@ var serverObject = require('../src/server'),
   jwt = require('jsonwebtoken'),
   assert = require('assert'),
   userData = {
-    "_id": "0",
-    "email": "admin@mail.com",
-    "password": "test",
-    "name": "test",
-    "role": "admin"
+    _id: '0',
+    email: 'admin@mail.com',
+    password: 'test',
+    name: 'test',
+    role: 'admin'
   },
   validAdminPayload = {
-    "_id": userData._id,
-    "role": userData.role
+    _id: userData._id,
+    role: userData.role
   },
   newUser = {
     name: 'testUser',
@@ -46,11 +46,11 @@ describe('Users Route', function() {
   };
 
 
-  beforeEach(function (done) {
+  before(function (done) {
     server = serverObject.makeServer(done);
   });
 
-  afterEach(function (done) {
+  after(function (done) {
     server.close(done);
   });
 

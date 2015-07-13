@@ -14,11 +14,11 @@ describe('Login Route', function(){
   var url = 'http://' + serverConfig.host + ':' + serverConfig.port;
   request = request(url);
 
-  beforeEach(function(done){
+  before(function(done){
     server = serverObject.makeServer(done);
   });
 
-  afterEach(function(done){
+  after(function(done){
     server.close(done);
   });
 
