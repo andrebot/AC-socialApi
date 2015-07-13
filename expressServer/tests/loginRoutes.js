@@ -2,16 +2,10 @@ var serverObject = require('../src/server');
 var request = require('supertest');
 var should = require('should');
 var jwt = require('jsonwebtoken');
-var User = require('./../src/schema/user.schema'),
-  Mongo = require('mongodb'),
-  ObjectID = Mongo.ObjectID,
-  assert = require("assert"),
-  testUser = new User({ 
-  "email": "admin@mail.com",
-  "password": "test",
-  "name": "test",
-  "role": "admin"
-});
+var testUser = {
+  email: 'admin@mail.com',
+  password: 'test'
+};
 
 
 describe('Login Route', function(){
@@ -56,13 +50,7 @@ describe('Login Route', function(){
     };
 
     request.post('/login')
-      .send(user)
-      .expect(403)
-      .end(function(error, response){
-        if(error) return done(error);
-
-        done();
-      });
+      .send(user).expect(403, done);
   });
 
 });

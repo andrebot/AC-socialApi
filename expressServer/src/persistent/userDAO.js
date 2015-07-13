@@ -1,22 +1,31 @@
 'use strict';
-var Promise = require('mpromise');
-var User = require('./../schema/user.schema')
+var User = require('./../schema/user.schema');
 
 var UserDAO = function(){
 
-  this.getUser = function(id) {
-    console.log('MongoDB - Get User - findById('+ id+ ')');
-    var query = User.findById(id);
-	  return query.exec();
+  var _defaultQueryFunction = function(successCB, failCB){
+    var defaultFunction = function(error, data){
+      if(data && !error) {
+        successCB(data);
+      } else {
+        failCB(error, data);
+      }
+    };
+
+    return defaultFunction;
   };
 
-  this.listAllUsers = function() {
+  this.getUser = function(id, successCB, failCB) {
+    console.log('MongoDB - Get User - findById(' + id + ')');
+    User.findById(id, _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.listAllUsers = function(successCB, failCB) {
     console.log('MongoDB - List All Users - findById()');
-    var query = User.find({});
-	  return query.exec();
+    User.find({}, _defaultQueryFunction(successCB, failCB));
   };
 
-  this.searchUsersByName = function(query) {
+  this.searchUsersByName = function(query, successCB, failCB) {
     console.log('MongoDB - Search users by name - find() by query');
     var querystring = query || '',
     searchRegExp = new RegExp('.*' + querystring + '.*', 'i'),
@@ -26,40 +35,42 @@ var UserDAO = function(){
         { email: searchRegExp } 
       ]
     };
-	  var query = User.find(criteria);	
-	  return query.exec();
+	User.find(criteria, _defaultQueryFunction(successCB, failCB));
   };
 
-  this.getUserByEmailAndPassword = function(email, password) {
-    console.log('MongoDB - Get User by Email and Password - findOne() by email: ' + email + ' and password: ' + password);
-    var query = User.findOne({ email: email, password: password});	
-	  return query.exec();
+  this.getUserByEmailAndPassword = function(userData, successCB, failCB) {
+    console.log('MongoDB - Get User by Email and Password - findOne() by email: ' + userData.username + ' and password: ' + userData.password);
+    User.findOne({ email: userData.username, password: userData.password}, _defaultQueryFunction(successCB, failCB));
   };
 
-  this.changePassword = function(userId, oldPassword, newPassword) {
+  this.changePassword = function(userData, successCB, failCB) {
     console.log('MongoDB - changePassword - findOneAndUpdate()');
-    var query = User.findOneAndUpdate({ '_id': userId, 'password': oldPassword }, { $set: { password: newPassword } }, { 'new': true });
-    return query.exec();
+    User.findOneAndUpdate({ '_id': userData._id, 'password': userData.oldPassword },
+                          { $set: { password: userData.newPassword } },
+                          { 'new': true },
+                          _defaultQueryFunction(successCB, failCB));
   };
 
-  this.createUser = function(name, email, password, callback){
-	  
-    var newUser = new User({ name: name, email: email, password: password});	 
-    var promise = new Promise;
-	  newUser.provider = 'local';
-	  newUser.role = 'user';
-	  newUser.save(function(err){
-      if(err) { promise.reject(err); return; }
-      console.log('Mongoose - Schema - User created');
-      promise.fulfill(newUser);
+  this.createUser = function(userData, successCB, failCB){
+    var newUser = new User({ name: userData.name,
+                             email: userData.email,
+                             password: userData.password});
+
+    newUser.provider = 'local';
+    newUser.role = 'user';
+    newUser.save(function(error){
+      if(error) {
+        failCB(error)
+      } else {
+        console.log('Mongoose - Schema - User created');
+        successCB(newUser);
+      }
     });
-    return promise;
   };
 
-  this.deleteUser = function(userId) {	  
+  this.deleteUser = function(userId, successCB, failCB) {
     console.log('MongoDB - User deleted - findOneAndRemove(' + userId + ')');
-    var query = User.findOneAndRemove(userId);
-    return query.exec();
+    User.findOneAndRemove(userId, _defaultQueryFunction(successCB, failCB));
   };
 };
 
