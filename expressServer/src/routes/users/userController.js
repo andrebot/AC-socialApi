@@ -1,47 +1,42 @@
-var userDAO = require('../../persistent/userDAO');
+var userDAO = require('../../persistent/userDAOFile');
 
 
 var UserController = function () { 
 	
   this.listUsers = function(request, response) {
     var search = request.query.q;
-    var promise;
+    var fail = function(error, data) {
+      console.log('User Controller Error: ' + error);
+      response.status(403).send({error: error, data: data});
+    };
+    var success = function(data) {
+      response.status(200).json(data);
+    };
 
     if(search) {
       console.log('Getting users by name using query = ' + search);
-      promise = userDAO.searchUsersByName(search);
+      userDAO.searchUsersByName(search, success, fail);
     } else {
       console.log('Getting all users.');
-      promise = userDAO.listAllUsers();
+      userDAO.listAllUsers(success, fail);
     }
-
-	  promise.then(function(data, err){
-      if(data && !err){
-        response.status(200).json(data);
-      } else {      
-        console.log('Err: ' + err);
-        response.status(403).send({error: errorMsg, data: data});
-      }    
-    });
-  
   };
 
   this.createUser = function(request, response) {
     var data = request.body;
-    console.log('Creating new user.');
-    if(data) {      
-      var promise = userDAO.createUser(data.name, data.email, data.password);
+    var fail = function(error, data) {
+      console.log(error);
+      response.status(403).send({error: error, data: data});
+    };
+    var success = function(data) {
+      console.log('User created');
+      console.log('Returning result: ' + data);
+      response.status(200).json(data);
+    };
 
-      promise.then(function(data){
-        console.log('User created');
-        console.log('Returning result: ' + data);
-        response.status(200).json(data);   
-      }, function(err){
-        console.log(err);
-        response.status(403).send({error: err, data: data});
-      });
-      
-      
+    console.log('Creating new user.');
+    if(data) {
+      userDAO.createUser(data, success, fail);
     } else {
       console.log('Error creating User.');
       response.status(403).send({error: 'Could not create user. Data malformed.', data: data});
@@ -49,86 +44,71 @@ var UserController = function () {
   };
 
   this.getLoggedUser = function(request, response) {
-    
-    var token = request.token;    
+    var token = request.token;
+    var fail = function(error, data){
+      console.log(error);
+      response.status(403).send({error: error, data: data});
+    };
+    var success = function(data){
+      console.log('Returning result: ' + data);
+      response.status(200).json(data);
+    };
     console.log('Getting user with #' + token._id);
 
-    var promise = userDAO.getUser(token._id);
-
-    promise.then(function(data, err){
-      
-      if(data && !err){
-        console.log('Returning result: ' + data);
-        response.status(200).json(data);
-      } else {      
-        console.log(err);
-        response.status(403).send({error: err, data: data});
-      }    
-    });
+    userDAO.getUser(token._id, success, fail);
   };
 
   this.getUser = function(request, response) {
-    console.log('Getting User #' + userId);
     var userId = request.params.userId;
-    var promise = userDAO.getUser(userId);
-    promise.then(function(data, err){
-      console.log('data :  '+ data);
-      console.log('err :  '+ err);
-      if(!err){
+    var fail = function(error) {
+      if(error) {
+        console.log('User Controller Error: ' + error);
+        console.log('Returning empty result');
+        response.status(200).json({});
+      }
+    };
+    var success = function(data) {
+      if(data) {
         console.log('Returning result: ' + data);
-        if(data)
-        { 
-          response.status(200).json(data); 
-        }
-        else
-        {
-          response.status(200).json([]); 
-        }
-      } else {      
-        console.log(err);
-        response.status(403).send({error: err, data: data});
-      }    
-    });
+        response.status(200).json(data);
+      }
+    };
+    console.log('Getting User #' + userId);
+    userDAO.getUser(userId, success, fail);
   };
 
   this.deleteUser = function(request, response) {
     var userId = request.params.userId;
+    var fail = function(error){
+      console.log(error);
+      response.status(403).send({error: error, data: data});
+    };
+    var success = function(data){
+      console.log('Returning result: ' + data);
+      response.status(200).json(data);
+    };
 
     console.log('Deleting User #' + userId);
-    
-    var promise = userDAO.deleteUser(userId);
-    
-    promise.then(function(data, err){
-      if(userId != data._id){
-        console.log('error: '+ userId + '   - data : ' + data._id);
-      }
-      if(data && !err){
-        console.log('Returning result: ' + data);
-        response.status(200).json(data);
-      } else {      
-        console.log(err);
-        response.status(403).send({error: err, data: data});
-      }    
-    });
+
+    userDAO.deleteUser(userId, success, fail);
   };
 
   this.changePassword = function(request, response) {
-    var userId = request.params.userId;
-    var data = request.body;
+    var userData = request.body;
+    var fail = function(error, data){
+      console.log(error);
+      response.status(403).send({error: error, data: data});
+    };
+    var success = function(data){
+      console.log('Password changed.');
+      response.status(200).json(data);
+    };
 
-    if(userId && data && data.oldPassword && data.newPassword) {
+    userData._id = request.params.userId;
+
+    if(userData._id && userData && userData.oldPassword && userData.newPassword) {
       console.log('Changing User Password.');
-      var promise = userDAO.changePassword(userId, data.oldPassword, data.newPassword);
-      promise.then(function(data, err){
-        if(data && !err){
-          console.log('Password changed.');
-          response.status(200).json(data);
-        } else {      
-          console.log(err);
-          response.status(403).send({error: err, data: data});
-        }    
-      });
-    
+      userDAO.changePassword(userData, success, fail);
     } else {
       var errorMsg = 'Could not change user\'s password. Wrong data.';
       console.log(errorMsg);

@@ -20,6 +20,16 @@ var UserSchema = new Schema({
  * Validations
  */
 
+//Validate empty name
+UserSchema
+    .path('name')
+    .validate(function(name){
+      if(name) {
+        return true;
+      }
+      return false;
+    }, 'Name cannot be blank');
+
 // Validate empty email
 UserSchema
   .path('email')
