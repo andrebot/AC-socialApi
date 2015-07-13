@@ -32,7 +32,6 @@ var UserDAO = function(){
 
   this.getUser = function(id, successCB, failCB) {
     if(users.length > id) {
-        console.log('EUEUEUEUUE');
       for(var x = users.length - 1; x >= 0; x--) {
         if(users[x]._id == id) {
           successCB(users[x]);

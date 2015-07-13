@@ -112,7 +112,7 @@ var UserController = function () {
     } else {
       var errorMsg = 'Could not change user\'s password. Wrong data.';
       console.log(errorMsg);
-      response.status(403).send({error: errorMsg, data: data});
+      response.status(403).send({error: errorMsg});
     }
   };
 };
