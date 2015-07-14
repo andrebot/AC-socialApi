@@ -1,7 +1,9 @@
 var User = require('../schema/user.schema.file');
+var Mongo = require('mongodb'),
+  ObjectID = Mongo.ObjectID;
 var users = [
     {
-        _id: 0,
+        _id: new ObjectID("55a46c913a411ca032a82882"),
         name: 'test',
         email: 'admin@mail.com',
         role: 'admin',
@@ -14,7 +16,7 @@ var users = [
         github: {}
     },
     {
-        _id: 1,
+        _id: new ObjectID("55a46cb6ecb6332c2c98218c"),
         name: 'Bruno Araujo',
         email: 'brunoaraujo1942@uol.com',
         role: 'user',
