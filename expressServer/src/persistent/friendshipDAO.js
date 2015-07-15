@@ -121,15 +121,15 @@ var FriendshipDAO = function(){
     this.updateFriendshipPropertyById(id, "blockUserRequester", block, successCB, failCB);
   };
 
-  this.updateFriendshipBlockRequestedStatusById = function(userId, friendId, block, successCB, failCB){
+  this.updateFriendshipBlockRequestedStatusById = function(id, block, successCB, failCB){
     this.updateFriendshipPropertyById(id, "blockUserRequested", block, successCB, failCB);
   };
 
-  this.updateFriendshipVipRequesterStatusById = function(userId, friendId, vip,successCB, failCB){
+  this.updateFriendshipVipRequesterStatusById = function(id, vip,successCB, failCB){
     this.updateFriendshipPropertyById(id, "vipUserRequester", vip, successCB, failCB);
   };
 
-  this.updateFriendshipVipRequestedStatusById = function(userId, friendId, vip,successCB, failCB){
+  this.updateFriendshipVipRequestedStatusById = function(id, vip,successCB, failCB){
     this.updateFriendshipPropertyById(id, "vipUserRequested", vip, successCB, failCB);
   };
 
