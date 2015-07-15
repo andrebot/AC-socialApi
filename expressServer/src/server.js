@@ -11,6 +11,7 @@ var cookieParser = require('cookie-parser');
 //Instantiating routes
 var users = require('./routes/users/userRouting');
 var login = require('./routes/login/loginRouting');
+var frienship = require('./routes/friendship/friendshipRouting');
 
 var mongoose = require('mongoose');
 
@@ -31,6 +32,7 @@ console.log('Adding routes...');
 app.use('/users', users);
 app.use('/login', login);
 
+app.use('/friendships', frienship);
 console.log('Exporting server object...');
 module.exports = {
   makeServer: function(done) {

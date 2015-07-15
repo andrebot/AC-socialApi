@@ -2,23 +2,25 @@ var serverObject = require('../src/server'),
   request = require('supertest'),
   should = require('should'),
   jwt = require('jsonwebtoken'),
-  assert = require('assert'),
+  User = require('./../src/schema/user.schema'),
+  Mongo = require('mongodb'),
+  ObjectID = Mongo.ObjectID,
+  assert = require("assert"),
   userData = {
-    _id: '0',
-    email: 'admin@mail.com',
-    password: 'test',
-    name: 'test',
-    role: 'admin'
+    "_id": new ObjectID(),  
+    "email":  "12345@mail.com",
+    "password": "test",
+    "name": "test",
+    "role": "admin"
   },
+  testUser = new User(userData),
   validAdminPayload = {
-    _id: userData._id,
-    role: userData.role
-  },
-  newUser = {
-    name: 'testUser',
-    email: new Date().getTime() + 'test@tester.com',
-    password: 'meuPassword'
+    "_id": testUser._id,  
+    "role": testUser.role
   };
+
+
+
 
 describe('Users Route', function() {
   var server;
@@ -48,10 +50,15 @@ describe('Users Route', function() {
 
   before(function (done) {
     server = serverObject.makeServer(done);
+    testUser.save(function(err){});
   });
 
   after(function (done) {
-    server.close(done);
+    User.findOneAndRemove(testUser._id, function(err, data){
+        console.log('after User Routes');
+        server.close(done);
+    });
+    
   });
 
   it('should list all users if I have the right cookie', function(done){
@@ -91,9 +98,9 @@ describe('Users Route', function() {
       });
   });
   
-  it('should get user with id ' + userData._id  +' using right cookie', function(done){
+  it('should get user with id ' + testUser._id  +' using right cookie', function(done){
     var token = getToken(validAdminPayload);
-    var idToTest = userData._id;
+    var idToTest = testUser._id;
 
     request.get('/users/' + idToTest)
       .set('Cookie', [serverConfig.cookieName + '=' + token])
@@ -139,9 +146,16 @@ describe('Users Route', function() {
   });
 
   it('should create an user with the right data', function(done){
+    var newUser = {
+    
+    "email": new Date().getTime() + "remove@mail.com",
+    "password": "test",
+    "name": "test",
+    "role": "user"
+  };
     request.post('/users')
       .send(newUser)
-      .expect(200)
+      
       .end(function(error, response){
         if(error) return done(error);
 
@@ -152,8 +166,10 @@ describe('Users Route', function() {
         assert.equal(newUser.email, user.email);
         assert.equal(newUser.name, user.name);
         assert.equal(newUser.password, user.password);
-
-        done();
+        User.findOneAndRemove(user._id, function(err, data){
+          console.log('user removed after created');
+          done();
+        });
       });
   });
 
@@ -186,7 +202,7 @@ describe('Users Route', function() {
 
     request.get('/users/' + idToTest)
       .set('Cookie', [serverConfig.cookieName + '=' + token])
-      .expect(200)
+      
       .end(function(error, response){
         if(error) return done(error);
 
@@ -250,7 +266,7 @@ describe('Users Route', function() {
 
   it('should not delete an user if I not an admin', function(done){
     var token = getToken({_id: 1, role: 'user'});
-    var idToTest = newUser._id;
+    var idToTest = userData._id;
 
     request.delete('/users/' + idToTest)
       .set('Cookie', [serverConfig.cookieName + "=" + token])
