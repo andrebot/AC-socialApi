@@ -17,22 +17,22 @@ var FriendshipDAO = function(){
 
   var _defaultQueryFriendshipInOrder  = function(userId, friendId){
     return { 
-      '$or': [ 
-        '$and': [
-          { 'userRequested': userId }, 
-          { 'userRequester': friendId }
-        ]
-    ]};
+     '$and': [
+        { 'userRequested': userId }, 
+        { 'userRequester': friendId }
+     ]
+    };
   };
 
   var _defaultQueryFriendshipNonOrdered  = function(userId, friendId){
-    var _query = _defaultQueryFriendshipInOrder(userId, friendId);
-    _query['$or'].push({
-      '$and': [
-        { 'userRequested': friendId }, 
-        { 'userRequester': userId }
+    var _defaultQuery = _defaultQueryFriendshipInOrder(userId, friendId);
+    var _defaultInverseQuery = _defaultQueryFriendshipInOrder(friendId, userId);
+    var _query = {
+      '$or' : [
+        _defaultQuery,
+        _defaultInverseQuery
       ]
-    });
+    };
     return _query;
   };
   
@@ -40,22 +40,19 @@ var FriendshipDAO = function(){
   var _defaultQueryMyFriendship  = function(userId){
     return { 
       '$or': [ 
-        '$and': [
-          { 'userRequested': userId }
-        ],
-        '$and': [
-          { 'userRequester': userId }
-        ]
-    ]};
+        { 'userRequested': userId },
+        { 'userRequester': userId }        
+      ]
+    };
   };
 
   this.getFriendship = function(id, successCB, failCB) {
     console.log('MongoDB - Get Friendship - findById(' + id + ')');
-    Friendship.findById(id, _defaultQueryFunction(successCB, failCB));
+    Friendship.findById(id, _defaultQueryFunction(successCB, failCB)).populate('userRequested userRequester');
   };
 
   this.getFriendshipByUserId = function(userId, friendId, successCB, failCB) {
-    console.log('MongoDB - Get Friendship By User Id- find( userId: ' + id + ')');
+    console.log('MongoDB - Get Friendship By User Id and FriendshipId - find( userId: ' + id + ', friendId: ' + friendId +')');
     Friendship.find(_defaultQueryFriendship(userId, friendId), _defaultQueryFunction(successCB, failCB));
   };  
 
@@ -85,24 +82,58 @@ var FriendshipDAO = function(){
     });
   };
 
-   this.updateFriendshipStatus = function(id, status, successCB, failCB){
+  this.updateFriendshipProperty = function(userId, friendId, property, value, successCB, failCB){
+    User.findOneAndUpdate(_defaultQueryFriendshipNonOrdered(userId, friendId),
+                          { $set: { property: value } },
+                          _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.updateFriendshipPropertyById = function(id, property, value, successCB, failCB){
     User.findOneAndUpdate({ '_id': id },
-                          { $set: { status: status } }
+                          { $set: { property: value } },
                           _defaultQueryFunction(successCB, failCB));
   };
 
-  this.updateFriendshipBlockStatus = function(userId, friendId, block,successCB, failCB){
-    User.findOneAndUpdate(_defaultQueryFriendshipInOrder,
-                          { $set: { blockUserRequester: block } }// Change to add logic to check who is the requester and who is the requested
-                          _defaultQueryFunction(successCB, failCB));
+   this.updateFriendshipStatus = function(id, status, successCB, failCB){
+    this.updateFriendshipPropertyById(id, "status", status, successCB, failCB);
   };
 
-  this.updateFriendshipVipStatus = function(userId, friendId, vip,successCB, failCB){
-    User.findOneAndUpdate(_defaultQueryFriendshipInOrder,
-                          { $set: { vipUserRequester: vip } } // Change to add logic to check who is the requester and who is the requested
-                          _defaultQueryFunction(successCB, failCB));
+
+  /****   UPDATE PROPERTIES    ***/
+
+  this.updateFriendshipBlockRequesterStatus = function(userId, friendId, block, successCB, failCB){
+    this.updateFriendshipProperty(userId, friendId, "blockUserRequester", block, successCB, failCB);
   };
 
+  this.updateFriendshipBlockRequestedStatus = function(userId, friendId, block, successCB, failCB){
+    this.updateFriendshipProperty(userId, friendId, "blockUserRequested", block, successCB, failCB);
+  };
+
+  this.updateFriendshipVipRequesterStatus = function(userId, friendId, vip,successCB, failCB){
+    this.updateFriendshipProperty(userId, friendId, "vipUserRequester", vip, successCB, failCB);
+  };
+
+  this.updateFriendshipVipRequestedStatus = function(userId, friendId, vip,successCB, failCB){
+    this.updateFriendshipProperty(userId, friendId, "vipUserRequested", vip, successCB, failCB);
+  };
+
+  this.updateFriendshipBlockRequesterStatusById = function(id, block, successCB, failCB){
+    this.updateFriendshipPropertyById(id, "blockUserRequester", block, successCB, failCB);
+  };
+
+  this.updateFriendshipBlockRequestedStatusById = function(userId, friendId, block, successCB, failCB){
+    this.updateFriendshipPropertyById(id, "blockUserRequested", block, successCB, failCB);
+  };
+
+  this.updateFriendshipVipRequesterStatusById = function(userId, friendId, vip,successCB, failCB){
+    this.updateFriendshipPropertyById(id, "vipUserRequester", vip, successCB, failCB);
+  };
+
+  this.updateFriendshipVipRequestedStatusById = function(userId, friendId, vip,successCB, failCB){
+    this.updateFriendshipPropertyById(id, "vipUserRequested", vip, successCB, failCB);
+  };
+
+  /****                     ***/
 
   this.acceptFriendship = function(id, successCB, failCB){
     this.updateFriendshipStatus(id, 1, successCB, failCB);
@@ -112,23 +143,6 @@ var FriendshipDAO = function(){
     this.updateFriendshipStatus(id, 2, successCB, failCB);
   };
 
-  this.blockFriendship = function(userId, friendId, successCB, failCB){
-    this.updateFriendshipBlockStatus(userId, friendId, true, successCB, failCB);
-  };
-
-  this.unblockFriendship = function(userId, friendId, successCB, failCB){
-    this.updateFriendshipBlockStatus(userId, friendId, false, successCB, failCB);
-  };
-
-  this.vipFriendship = function(userId, friendId, successCB, failCB){
-    this.updateFriendshipVipStatus(userId, friendId, true, successCB, failCB);
-  };
-
-  this.unvipFriendship = function(userId, friendId, successCB, failCB){
-    this.updateFriendshipVipStatus(userId, friendId, false, successCB, failCB);
-  };
-
- 
   this.deleteFriendship = function(id, successCB, failCB) {
     console.log('MongoDB - Friendship deleted - findOneAndRemove(' + id + ')');
     Friendship.findOneAndRemove(id, _defaultQueryFunction(successCB, failCB));

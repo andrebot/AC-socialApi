@@ -5,6 +5,7 @@ var mongoose = require('mongoose'),
 
 var FriendshipSchema = new Schema({
   status: { type: Number, default: 0},
+  
   userRequested: {type: Schema.ObjectId, ref: 'User'},
   userRequester: {type: Schema.ObjectId, ref: 'User'},
   blockUserRequested: { type: Boolean, default: false},
