@@ -1,4 +1,4 @@
-var userDAO = require('../../persistent/userDAOFile');
+var userDAO = require('../../persistent/userDAO');
 
 
 var UserController = function () { 
