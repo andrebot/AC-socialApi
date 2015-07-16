@@ -42,7 +42,10 @@ var FriendshipDAO = function(){
       '$or': [ 
         { 'userRequested': userId },
         { 'userRequester': userId }        
-      ]
+      ],
+	  'status' : 1, // Status = accepted(1)
+	  'blockUserRequested' : false,
+	  'blockUserRequester' : false
     };
   };
 
@@ -53,7 +56,7 @@ var FriendshipDAO = function(){
 
   this.getFriendshipByUserId = function(userId, friendId, successCB, failCB) {
     console.log('MongoDB - Get Friendship By User Id and FriendshipId - find( userId: ' + id + ', friendId: ' + friendId +')');
-    Friendship.find(_defaultQueryFriendship(userId, friendId), _defaultQueryFunction(successCB, failCB));
+    Friendship.find(_defaultQueryFriendshipNonOrdered(userId, friendId), _defaultQueryFunction(successCB, failCB));
   };  
 
   this.listAllFriendships = function(successCB, failCB) {
