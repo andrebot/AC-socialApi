@@ -4,26 +4,26 @@ var express = require('express');
 var router = express.Router();
 
 router.route('/')
-  .get(friendshipController.listAllFriendships); //Done
+  .get(auth.isAuthenticated, friendshipController.listAllFriendships);  // OK
 
 router.route('/me')
-  .get(friendshipController.listMyFriendships);
+  .get(auth.isAuthenticated, friendshipController.listMyFriendships);  // OK
 
 
 router.route('/:friendId')
-  .get(friendshipController.getFriendship), //Done
-  .post(friendshipController.inviteFriend),
-  .put(friendshipController.acceptFriend),
-  .delete(friendshipController.rejectFriend);
+  .get(auth.isAuthenticated, friendshipController.getFriendship) // OK
+  .post(auth.isAuthenticated, friendshipController.inviteFriend) // OK
+  .put(auth.isAuthenticated, friendshipController.acceptFriend) 
+  .delete(auth.isAuthenticated, friendshipController.rejectFriend);
  
 router.route('/:friendId/vip')
-  .put(friendshipController.setVip),
-  .delete(friendshipController.unsetVip);
+  .post(auth.isAuthenticated, friendshipController.setVip)
+  .delete(auth.isAuthenticated, friendshipController.unsetVip);
  
 
 router.route('/:friendId/block')
-  .put(friendshipController.setBlock),
-  .delete(friendshipController.unsetBlock);
+  .post(auth.isAuthenticated, friendshipController.setBlock)
+  .delete(auth.isAuthenticated, friendshipController.unsetBlock);
  
 
   
