@@ -16,18 +16,11 @@ var FriendshipSchema = new Schema({
 });
 
 FriendshipSchema.methods.CheckIsRequester  = function(userId) {
-  console.log('token: ' + userId);
-  console.log('requester: ' + this.userRequester);
-  console.log('result: ' + this.userRequester === userId);
   return this._id.userRequester.toString() === userId;
 };
 
 
 FriendshipSchema.methods.CheckIsRequested  = function(userId) {
-  console.log('token: ' + userId);
-  console.log('requested: ' + this.userRequested);
-  console.log('result: ' + this.userRequested === userId);
-  debugger;
   return this._id.userRequested.toString() === userId;
 };
 

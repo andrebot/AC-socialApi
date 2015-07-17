@@ -13,8 +13,8 @@ router.route('/me')
 router.route('/:friendId')
   .get(auth.isAuthenticated, friendshipController.getFriendship) // OK
   .post(auth.isAuthenticated, friendshipController.inviteFriend) // OK
-  .put(auth.isAuthenticated, friendshipController.acceptFriend) 
-  .delete(auth.isAuthenticated, friendshipController.rejectFriend);
+  .put(auth.isAuthenticated, friendshipController.acceptFriend)  // OK
+  .delete(auth.isAuthenticated, friendshipController.rejectFriend); // OK
  
 router.route('/:friendId/vip')
   .post(auth.isAuthenticated, friendshipController.setVip)
