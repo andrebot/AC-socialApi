@@ -31,7 +31,6 @@ console.log('Adding routes...');
 //Preparing routes
 app.use('/users', users);
 app.use('/login', login);
-
 app.use('/friendships', frienship);
 console.log('Exporting server object...');
 module.exports = {
