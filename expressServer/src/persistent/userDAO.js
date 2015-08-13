@@ -25,6 +25,11 @@ var UserDAO = function(){
     User.find({}, _defaultQueryFunction(successCB, failCB));
   };
 
+  this.listUsersById = function(usersIds, successCB, failCB) {
+    console.log('MongoDB - List Users by IDs - find()');
+    User.find({ _id: { $in: usersIds}}, _defaultQueryFunction(successCB, failCB));
+  };
+
   this.searchUsersByName = function(query, successCB, failCB) {
     console.log('MongoDB - Search users by name - find() by query');
     var querystring = query || '',

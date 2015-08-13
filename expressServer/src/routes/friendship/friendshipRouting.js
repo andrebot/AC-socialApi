@@ -9,6 +9,8 @@ router.route('/')
 router.route('/me')
   .get(auth.isAuthenticated, friendshipController.listMyFriendships);  // OK
 
+router.route('/requested')
+  .get(auth.isAuthenticated, friendshipController.listFriendshipsIRequested);
 
 router.route('/:friendId')
   .get(auth.isAuthenticated, friendshipController.getFriendship) // OK
