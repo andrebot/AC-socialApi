@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
   <meta charset="UTF-8">
-  <title>Node Course</title>
+  <title>Backbone Course</title>
 
   <link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css"/>
   <style type="text/css">
@@ -120,12 +120,43 @@
 
         </div>
       </div>
+
+       <div class="panel panel-default">
+        <div class="panel-heading">Backbone Test: My Profile </div>
+        <div class="panel-body backboneTest wrap">
+          <div id="myProfile"></div>
+        </div>
+      </div>
+
+       <div class="panel panel-default">
+        <div class="panel-heading">Backbone Test: Users List </div>
+        <div class="panel-body backboneTest wrap">
+          <div id="allUsers"></div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Backbone Test: My Friends</div>
+        <div class="panel-body backboneTest wrap">
+          <div id="myFriends"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <script type="text/javascript" src="lib/js/jquery.min.js"></script>
   <script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="lib/js/jquery.cookie.js"></script>
+
+  <script type="text/javascript" src="./lib/js/md5/build/md5.min.js"></script>
+  <script type="text/javascript" src="./lib/js/json2/json2.js"></script>
+
+  <script type="text/javascript" src="./lib/js/underscore/underscore-min.js"></script>
+  <script type="text/javascript" src="./lib/js/backbone/backbone-min.js"></script>
+
+  <script type="text/javascript" src="./assets/js/AvenuOrkut.js"></script>
+
   <script type="application/javascript">
 
     function makeAjaxCall(url, type, title, data) {
@@ -229,7 +260,8 @@
       var form = $(this);
       var url = form.attr("action") + '/' + $('#passwordUserId').val() + '/password';
       makeFormCall(form, event, 'PUT', 'Change Password', url);
-    });
+    });    
+
   </script>
 </body>
 </html>

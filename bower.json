@@ -1,0 +1,12 @@
+{
+  "name": "Backbone Tutorial",
+  "version": "1.0.0",
+  "dependencies": {
+    "requirejs": "latest",
+    "jquery": "latest",
+    "json2": "latest",
+    "backbone": "latest",
+    "underscore": "latest",
+    "md5": "latest"
+  }
+}
