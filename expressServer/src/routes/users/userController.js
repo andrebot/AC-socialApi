@@ -5,6 +5,7 @@ var UserController = function () {
 	
   this.listUsers = function(request, response) {
     var search = request.query.q;
+    var list = request.query.list ? request.query.list.split(',') : null;
     var fail = function(error, data) {
       console.log('User Controller Error: ' + error);
       response.status(403).send({error: error, data: data});
@@ -16,6 +17,9 @@ var UserController = function () {
     if(search) {
       console.log('Getting users by name using query = ' + search);
       userDAO.searchUsersByName(search, success, fail);
+    } else if(list) {
+      console.log('Getting users by ids using query = ' + list);
+      userDAO.listUsersById(list, success, fail);
     } else {
       console.log('Getting all users.');
       userDAO.listAllUsers(success, fail);
