@@ -8,7 +8,8 @@ router.route('/')
   .post(userController.createUser);
 
 router.route('/me')
-  .get(auth.isAuthenticated, userController.getLoggedUser);
+  .get(auth.isAuthenticated, userController.getLoggedUser)
+  .put(auth.isAuthenticated, userController.updateLoggedUser);
 
 router.route('/:userId')
   .get(auth.isAuthenticated, userController.getUser)
