@@ -1,5 +1,6 @@
 'use strict';
-var User = require('./../schema/user.schema');
+var _ = require('lodash'),
+    User = require('./../schema/user.schema');
 
 var UserDAO = function(){
 
@@ -72,6 +73,16 @@ var UserDAO = function(){
       }
     });
   };
+
+  this.updateUser = function(id, userData, successCB, failCB) {
+    userData = _.pick(userData, ['name', 'email']);
+
+    console.log('MongoDB - updateUser - findOneAndUpdate()');
+    User.findOneAndUpdate({ '_id': id },
+                          { $set: userData },
+                          { 'new': true },
+                          _defaultQueryFunction(successCB, failCB));
+  }
 
   this.deleteUser = function(userId, successCB, failCB) {
     console.log('MongoDB - User deleted - findOneAndRemove(' + userId + ')');
