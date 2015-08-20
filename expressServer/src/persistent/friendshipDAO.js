@@ -72,7 +72,7 @@ var FriendshipDAO = function(){
 
   this.getFriendshipRerquestedById = function(userId, successCB, failCB) {
     console.log('MongoDB - List All Friendships I requested - find()');
-    Friendship.find({_id: {userRequester: userId}}, _defaultQueryFunction(successCB, failCB));
+    Friendship.find({'_id.userRequester': userId}, _defaultQueryFunction(successCB, failCB));
   };
 
   /****   UPDATE PROPERTIES    ***/
