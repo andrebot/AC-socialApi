@@ -52,6 +52,8 @@ Endpoints Available
   * '/users/:userId' - GET - Get user with given ID
   * '/users/:userId' - DELETE - Delete user with given ID
   * '/users/:userId/password' - PUT - Change user's password
+  * '/friendships/requested' - GET - Get friendships that logged user requested
+  * '/friendships/received' - GET - Get friendships that logged user received
   
   All endpoints are authenticated/authorized, but creating user. This endpoint is public. And the endpoint
   to delete user is authorized only to a admin.

@@ -33,7 +33,7 @@ var FriendshipController = function () {
     
   };
 
-  this.listFriendshipsIRequested = function(request, response) {
+  this.listFriendshipsRequested = function(request, response) {
     var token = request.token;
     var fail = function(error) {
       if(error) {
@@ -50,7 +50,27 @@ var FriendshipController = function () {
     };
 
     console.log('Getting Friendships that logged user requested.');
-    friendshipDAO.getFriendshipRerquestedById(token._id, success, fail);
+    friendshipDAO.getFriendshipRequested(token._id, success, fail);
+  };
+
+  this.listFriendshipsReceived = function(request, response) {
+    var token = request.token;
+    var fail = function(error) {
+      if(error) {
+        console.log('Friendship Controller Error: ' + error);
+        console.log('Returning empty results');
+        response.status(200).json({});
+      }
+    };
+    var success = function(data) {
+      if(data) {
+        console.log('Returning result: ' + data);
+        response.status(200).json(data);
+      }
+    };
+
+    console.log('Getting Friendships that logged user received.');
+    friendshipDAO.getFriendshipReceived(token._id, success, fail);
   };
 
   this.getFriendship = function(request, response) {  	

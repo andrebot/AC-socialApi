@@ -70,9 +70,38 @@ var FriendshipDAO = function(){
     Friendship.find(_defaultQueryMyFriendship(userId), _defaultQueryFunction(successCB, failCB));
   };
 
-  this.getFriendshipRerquestedById = function(userId, successCB, failCB) {
-    console.log('MongoDB - List All Friendships I requested - find()');
-    Friendship.find({'_id.userRequester': userId}, _defaultQueryFunction(successCB, failCB));
+  this.getFriendshipRequested = function(userId, successCB, failCB) {
+    console.log('MongoDB - List All Friendships requested by a given user id - find()');
+
+    var handler = _defaultQueryFunction(successCB, failCB),
+        query = {
+          '_id.userRequester': userId,
+          'status': 0,
+          'blockUserRequested': false,
+          'blockUserRequester': false
+        };
+
+    Friendship
+      .find(query)
+      .populate('_id.userRequested', 'name email')
+      .exec(handler);
+  };
+
+  this.getFriendshipReceived = function(userId, successCB, failCB) {
+    console.log('MongoDB - List All Friendships requested to a given user id - find()');
+
+    var handler = _defaultQueryFunction(successCB, failCB),
+        query = {
+          '_id.userRequested': userId,
+          'status': 0,
+          'blockUserRequested': false,
+          'blockUserRequester': false
+        };
+
+    Friendship
+      .find(query)
+      .populate('_id.userRequester', 'name email')
+      .exec(handler);
   };
 
   /****   UPDATE PROPERTIES    ***/
