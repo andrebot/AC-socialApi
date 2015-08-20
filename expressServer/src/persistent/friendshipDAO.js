@@ -1,7 +1,8 @@
 'use strict';
-var Friendship = require('./../schema/friendship.schema'),
-  Mongo = require('mongodb'),
-  ObjectID = Mongo.ObjectID;
+var _ = require('lodash'),
+    Friendship = require('./../schema/friendship.schema'),
+    Mongo = require('mongodb'),
+    ObjectID = Mongo.ObjectID;
 
 var FriendshipDAO = function(){
 
@@ -16,6 +17,20 @@ var FriendshipDAO = function(){
 
     return defaultFunction;
   };
+
+  var _getAllMyFriendshipIdsQueryFunction = function(userId, successCB, failCB) {
+    var friendshipSuccessCB = function(data) {
+      console.log('Processing ' + data.length + ' friendship ids');
+
+      var ids = _.map(data, function(friendship) {
+        return friendship._id.userRequester != userId ? friendship._id.userRequester : friendship._id.userRequested;
+      });
+
+      successCB(ids);
+    }
+
+    return _defaultQueryFunction(friendshipSuccessCB, failCB);
+  }
 
   var _defaultQueryFriendshipInOrder  = function(userId, friendId){
     return { 
@@ -68,6 +83,11 @@ var FriendshipDAO = function(){
   this.listAllMyFriendships = function(userId, successCB, failCB) {
     console.log('MongoDB - List All My Friendships - find()');
     Friendship.find(_defaultQueryMyFriendship(userId), _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.getAllMyFriendshipIds = function(userId, successCB, failCB) {
+    console.log('MongoDB - List All My Friendship ids - find()');
+    Friendship.find(_defaultQueryMyFriendship(userId), '_id', _getAllMyFriendshipIdsQueryFunction(userId, successCB, failCB));
   };
 
   this.getFriendshipRequested = function(userId, successCB, failCB) {

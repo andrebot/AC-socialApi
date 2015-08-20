@@ -1,5 +1,6 @@
 'use strict';
 var _ = require('lodash'),
+    config = require('../config'),
     User = require('./../schema/user.schema');
 
 var UserDAO = function(){
@@ -82,6 +83,19 @@ var UserDAO = function(){
                           { $set: userData },
                           { 'new': true },
                           _defaultQueryFunction(successCB, failCB));
+  }
+
+  this.getAvailableFriends = function(userId, friendshipUserIds, successCB, failCB) {
+    console.log('MongoDB - Get Available Users - find()');
+
+    var invalidUserIds = _.clone(friendshipUserIds);
+    invalidUserIds.push(userId);
+    
+    User
+      .find({ _id: { $nin: invalidUserIds}})
+      .select('name email')
+      .limit(config.availableFriendsLimit).
+      exec(_defaultQueryFunction(successCB, failCB));
   }
 
   this.deleteUser = function(userId, successCB, failCB) {

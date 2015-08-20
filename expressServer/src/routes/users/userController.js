@@ -1,4 +1,5 @@
-var userDAO = require('../../persistent/userDAO');
+var userDAO = require('../../persistent/userDAO'),
+    friendshipDAO = require('../../persistent/friendshipDAO');
 
 
 var UserController = function () { 
@@ -145,6 +146,28 @@ var UserController = function () {
       response.status(403).send({error: errorMsg});
     }
   };
+
+  this.getAvailableFriends = function(request, response) {
+    var token = request.token,
+        userId = token._id;
+
+    var fail = function(error, data){
+      console.log(error);
+      response.status(403).send({error: error, data: data});
+    };
+
+    var success = function(data){
+      console.log('Returning result: ' + data);
+      response.status(200).json(data);
+    };
+
+    var friendshipSuccess = function(friendshipUserIds) {
+      userDAO.getAvailableFriends(userId, friendshipUserIds, success, fail);
+    };
+
+    console.log('Getting available users with #' + userId);
+    friendshipDAO.getAllMyFriendshipIds(userId, friendshipSuccess, fail);
+  }
 };
 
 module.exports = new UserController();
