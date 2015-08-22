@@ -8,13 +8,31 @@ var FriendshipDAO = function(){
 
   // Method to parse the response moving the _id.userRequested 
   // and _id.userRequester to the parent level.
-  var _parseResponseDefault = function(successCB, failCB) {
+  var _parseQueryFunction = function(successCB, failCB) {
     var parse = function(data) {
       var items = [];
       _.each(data, function(item) {
         var json = item.toJSON();
         json.userRequested = json._id.userRequested;
         json.userRequester = json._id.userRequester;
+        delete json._id;
+        items.push(json);
+      });
+
+      successCB(items);
+    };
+
+    return _defaultQueryFunction(parse, failCB);
+  };
+
+  var _parseMyFriendsQueryFunction = function(userId, successCB, failCB) {
+    var parse = function(data) {
+      var items = [];
+      _.each(data, function(item) {
+        var json = item.toJSON(),
+            friend = json._id.userRequested._id == userId ? json._id.userRequester : json._id.userRequested;
+
+        json.user = friend;
         delete json._id;
         items.push(json);
       });
@@ -101,7 +119,12 @@ var FriendshipDAO = function(){
 
   this.listAllMyFriendships = function(userId, successCB, failCB) {
     console.log('MongoDB - List All My Friendships - find()');
-    Friendship.find(_defaultQueryMyFriendship(userId), _defaultQueryFunction(successCB, failCB));
+    Friendship
+      .find(_defaultQueryMyFriendship(userId))
+      .select('_id')
+      .populate('_id.userRequested', 'name email')
+      .populate('_id.userRequester', 'name email')
+      .exec(_parseMyFriendsQueryFunction(userId, successCB, failCB));
   };
 
   this.getAllMyFriendshipIds = function(userId, successCB, failCB) {
@@ -122,7 +145,7 @@ var FriendshipDAO = function(){
   this.getFriendshipRequested = function(userId, successCB, failCB) {
     console.log('MongoDB - List All Friendships requested by a given user id - find()');
 
-    var handler = _parseResponseDefault(successCB, failCB),
+    var handler = _parseQueryFunction(successCB, failCB),
         query = {
           '_id.userRequester': userId,
           'status': 0,
@@ -141,7 +164,7 @@ var FriendshipDAO = function(){
   this.getFriendshipRequests = function(userId, successCB, failCB) {
     console.log('MongoDB - List All Friendships requested to a given user id - find()');
 
-    var handler = _parseResponseDefault(successCB, failCB),
+    var handler = _parseQueryFunction(successCB, failCB),
         query = {
           '_id.userRequested': userId,
           'status': 0,
