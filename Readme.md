@@ -48,6 +48,7 @@ Endpoints Available
   * '/users/?q=_query_' - GET - List of all users or search by name using _query_
   * '/users/' - POST - Create user
   * '/users/me' - GET - Get logged user
+  * '/users/me' - PUT - Update logged user profile
   * '/users/:userId' - GET - Get user with given ID
   * '/users/:userId' - DELETE - Delete user with given ID
   * '/users/:userId/password' - PUT - Change user's password
