@@ -67,7 +67,7 @@ var UserDAO = function(){
     newUser.role = 'user';
     newUser.save(function(error){
       if(error) {
-        failCB(error)
+        failCB(error);
       } else {
         console.log('Mongoose - Schema - User created');
         successCB(newUser);
@@ -83,7 +83,7 @@ var UserDAO = function(){
                           { $set: userData },
                           { 'new': true },
                           _defaultQueryFunction(successCB, failCB));
-  }
+  };
 
   this.getAvailableFriends = function(userId, friendshipUserIds, successCB, failCB) {
     console.log('MongoDB - Get Available Users - find()');
@@ -96,7 +96,7 @@ var UserDAO = function(){
       .select('name email')
       .limit(config.availableFriendsLimit).
       exec(_defaultQueryFunction(successCB, failCB));
-  }
+  };
 
   this.deleteUser = function(userId, successCB, failCB) {
     console.log('MongoDB - User deleted - findOneAndRemove(' + userId + ')');

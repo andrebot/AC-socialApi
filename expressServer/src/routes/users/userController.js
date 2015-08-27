@@ -167,7 +167,7 @@ var UserController = function () {
 
     console.log('Getting available users with #' + userId);
     friendshipDAO.getAllMyFriendshipIds(userId, friendshipSuccess, fail);
-  }
+  };
 };
 
 module.exports = new UserController();

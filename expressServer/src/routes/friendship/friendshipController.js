@@ -53,7 +53,7 @@ var FriendshipController = function () {
     friendshipDAO.getFriendshipRequested(token._id, success, fail);
   };
 
-  this.listFriendshipsReceived = function(request, response) {
+  this.listFriendshipsRequests = function(request, response) {
     var token = request.token;
     var fail = function(error) {
       if(error) {
@@ -70,7 +70,7 @@ var FriendshipController = function () {
     };
 
     console.log('Getting Friendships that logged user received.');
-    friendshipDAO.getFriendshipReceived(token._id, success, fail);
+    friendshipDAO.getFriendshipRequests(token._id, success, fail);
   };
 
   this.getFriendship = function(request, response) {  	
