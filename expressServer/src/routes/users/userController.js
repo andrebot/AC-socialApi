@@ -1,4 +1,5 @@
-var userDAO = require('../../persistent/userDAO');
+var userDAO = require('../../persistent/userDAO'),
+    friendshipDAO = require('../../persistent/friendshipDAO');
 
 
 var UserController = function () { 
@@ -62,6 +63,32 @@ var UserController = function () {
     userDAO.getUser(token._id, success, fail);
   };
 
+  this.updateLoggedUser = function(request, response) {
+    var data = request.body || {},
+        token = request.token || {},
+        id = token._id || 0;
+
+    var fail = function(error, data) {
+      console.log(error);
+      response.status(403).send({error: error, data: data});
+    };
+
+    var success = function(data) {
+      console.log('User profile updated');
+      console.log('Returning result: ' + data);
+      response.status(200).json(data);
+    };
+
+    console.log('Updating user profile.');
+
+    if(id && data) {
+      userDAO.updateUser(id, data, success, fail);
+    } else {
+      console.log('Error updating user profile.');
+      response.status(403).send({error: 'Could not update user profile. Data malformed.', data: data});
+    }
+  }
+
   this.getUser = function(request, response) {
     var userId = request.params.userId;
     var fail = function(error) {
@@ -118,6 +145,28 @@ var UserController = function () {
       console.log(errorMsg);
       response.status(403).send({error: errorMsg});
     }
+  };
+
+  this.getAvailableFriends = function(request, response) {
+    var token = request.token,
+        userId = token._id;
+
+    var fail = function(error, data){
+      console.log(error);
+      response.status(403).send({error: error, data: data});
+    };
+
+    var success = function(data){
+      console.log('Returning result: ' + data);
+      response.status(200).json(data);
+    };
+
+    var friendshipSuccess = function(friendshipUserIds) {
+      userDAO.getAvailableFriends(userId, friendshipUserIds, success, fail);
+    };
+
+    console.log('Getting available users with #' + userId);
+    friendshipDAO.getAllMyFriendshipIds(userId, friendshipSuccess, fail);
   };
 };
 
