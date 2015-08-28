@@ -2,9 +2,9 @@
   "name": "AC-socialAPI",
   "version": "0.0.0",
   "description": "Avenue Code Training Code",
-  "main": "index.js",
+  "main": "expressServer/src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node expressServer/src/index.js"
   },
   "repository": {
     "type": "git",
