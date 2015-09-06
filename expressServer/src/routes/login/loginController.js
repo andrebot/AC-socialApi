@@ -1,5 +1,5 @@
 var auth = require('../../auth/authorization');
-var userDAO = require('../../persistent/userDAOFile');
+var userDAO = require('../../persistent/userDAO');
 
 
 var LoginController = function () {

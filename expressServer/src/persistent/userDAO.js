@@ -1,5 +1,7 @@
 'use strict';
-var User = require('./../schema/user.schema');
+var _ = require('lodash'),
+    config = require('../config'),
+    User = require('./../schema/user.schema');
 
 var UserDAO = function(){
 
@@ -23,6 +25,11 @@ var UserDAO = function(){
   this.listAllUsers = function(successCB, failCB) {
     console.log('MongoDB - List All Users - findById()');
     User.find({}, _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.listUsersById = function(usersIds, successCB, failCB) {
+    console.log('MongoDB - List Users by IDs - find()');
+    User.find({ _id: { $in: usersIds}}, _defaultQueryFunction(successCB, failCB));
   };
 
   this.searchUsersByName = function(query, successCB, failCB) {
@@ -60,12 +67,35 @@ var UserDAO = function(){
     newUser.role = 'user';
     newUser.save(function(error){
       if(error) {
-        failCB(error)
+        failCB(error);
       } else {
         console.log('Mongoose - Schema - User created');
         successCB(newUser);
       }
     });
+  };
+
+  this.updateUser = function(id, userData, successCB, failCB) {
+    userData = _.pick(userData, ['name', 'email']);
+
+    console.log('MongoDB - updateUser - findOneAndUpdate()');
+    User.findOneAndUpdate({ '_id': id },
+                          { $set: userData },
+                          { 'new': true },
+                          _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.getAvailableFriends = function(userId, friendshipUserIds, successCB, failCB) {
+    console.log('MongoDB - Get Available Users - find()');
+
+    var invalidUserIds = _.clone(friendshipUserIds);
+    invalidUserIds.push(userId);
+    
+    User
+      .find({ _id: { $nin: invalidUserIds}})
+      .select('name email')
+      .limit(config.availableFriendsLimit).
+      exec(_defaultQueryFunction(successCB, failCB));
   };
 
   this.deleteUser = function(userId, successCB, failCB) {
