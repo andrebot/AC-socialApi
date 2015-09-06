@@ -23,7 +23,7 @@ var Auth = function() {
     if(verifyAuth(request)) {
       next();
     } else {
-      response.sendStatus(407);
+      response.sendStatus(401);
     }
   };
 
