@@ -52,9 +52,19 @@ Endpoints Available
   * '/users/available' - GET - Get all users that can be added as a friend
   * '/users/:userId' - GET - Get user with given ID
   * '/users/:userId' - DELETE - Delete user with given ID
-  * '/users/:userId/password' - PUT - Change user's password
-  * '/friendships/requested' - GET - Get friendships that logged user requested
-  * '/friendships/received' - GET - Get friendships that logged user received
+  * '/users/password/:userId' - PUT - Change user's password
+  * '/friendships/' - GET - Get all friendships
+  * '/friendships/me' - GET - Get all logged user's friendships
+  * '/friendships/requests' - GET - Get all friendships that requests logged user
+  * '/friendships/requested' - GET - Get friendships that were requested by logged user
+  * '/friendships/:friendId' - GET - Get friendships between logged user and user with the ID provided
+  * '/friendships/:friendId' - POST - Invite user with the ID provided
+  * '/friendships/:friendId' - PUT - Accept request from user with ID provided
+  * '/friendships/:friendId' - DELETE - Reject requests from user with ID provided
+  * '/friendships/vip/:friendId' - POST - Set friendship with user as VIP
+  * '/friendships/vip/:friendId' - DELETE - Unset friendship with user as VIP
+  * '/friendships/block/:friendId' - POST - Block friendship with user
+  * '/friendships/block/:friendId' - DELETE - Block friendship with user
   
   All endpoints are authenticated/authorized, but creating user. This endpoint is public. And the endpoint
   to delete user is authorized only to a admin.
@@ -62,7 +72,8 @@ Endpoints Available
 Auth
 ----
 
-  Authorization/Authentication is done using token, by JWT.
+  Authorization/Authentication is done using token, by JWT. You can choose to use authentication by cookie or by
+  Authorization header in the request.
   
 Test
 ----
@@ -99,8 +110,3 @@ Test
 
    Otherwise a exception will explode in the console because of windows path.
    [Blanket Issue 491](https://github.com/alex-seville/blanket/issues/491)
-  
-TO-DO
------
-
-  * Add Friend endpoints (https://github.com/hcbelias/socialnetwork/tree/release)
