@@ -4,10 +4,10 @@ var express = require('express');
 var router = express.Router();
 
 router.route('/')
-  .get(auth.isAuthenticated, friendshipController.listAllFriendships);  // OK
+  .get(auth.isAuthenticated, friendshipController.listAllFriendships);
 
 router.route('/me')
-  .get(auth.isAuthenticated, friendshipController.listMyFriendships);  // OK
+  .get(auth.isAuthenticated, friendshipController.listMyFriendships);
 
 router.route('/requests')
   .get(auth.isAuthenticated, friendshipController.listFriendshipsRequests);
@@ -16,21 +16,17 @@ router.route('/requested')
   .get(auth.isAuthenticated, friendshipController.listFriendshipsRequested);
 
 router.route('/:friendId')
-  .get(auth.isAuthenticated, friendshipController.getFriendship) // OK
-  .post(auth.isAuthenticated, friendshipController.inviteFriend) // OK
-  .put(auth.isAuthenticated, friendshipController.acceptFriend)  // OK
-  .delete(auth.isAuthenticated, friendshipController.rejectFriend); // OK
- 
-router.route('/:friendId/vip')
+  .get(auth.isAuthenticated, friendshipController.getFriendship)
+  .post(auth.isAuthenticated, friendshipController.inviteFriend)
+  .put(auth.isAuthenticated, friendshipController.acceptFriend)
+  .delete(auth.isAuthenticated, friendshipController.rejectFriend);
+
+router.route('/vip/:friendId')
   .post(auth.isAuthenticated, friendshipController.setVip)
   .delete(auth.isAuthenticated, friendshipController.unsetVip);
- 
 
-router.route('/:friendId/block')
+router.route('/block/:friendId')
   .post(auth.isAuthenticated, friendshipController.setBlock)
   .delete(auth.isAuthenticated, friendshipController.unsetBlock);
- 
 
-  
-  
 module.exports = router;

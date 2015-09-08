@@ -4,9 +4,17 @@ var jwt = require('jsonwebtoken');
 var Auth = function() {
   var verifyAuth = function(request) {
     var cookie = request.cookies[config.cookieName];
-    if(cookie) {
+    var authHeader;
+    if (request.headers.authorization) {
+        authHeader = request.headers.authorization.split(' ');
+        if(authHeader.length === 2 && authHeader[0] === 'bearer') {
+            authHeader = authHeader[1];
+        }
+    }
+    var token = cookie || authHeader;
+    if(token) {
       try {
-        request.token = jwt.verify(cookie, config.secret, {issuer: config.issuer, ignoreExpiration: false});
+        request.token = jwt.verify(token, config.secret, {issuer: config.issuer, ignoreExpiration: false});
         return true;
       } catch(error) {
         console.log('Request unauthorized. Error decoding token.');

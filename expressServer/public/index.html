@@ -16,6 +16,7 @@
 
     .wrap {
       word-break: break-all;
+        max-height: 900px;
     }
   </style>
 </head>
@@ -39,14 +40,35 @@
           </form>
 
           <div class="well margin-bottom">
-            <button onclick="listAllUsers()" class="btn btn-primary btn-block">List All Users</button>
-            <button onclick="getMe()" class="btn btn-primary btn-block">Get Current Logged User</button>
-            <button onclick="getUserById()" class="btn btn-primary btn-block">Get User by ID</button>
-            <button onclick="searchByName()" class="btn btn-primary btn-block">Search User By Name</button>
-            <button onclick="deleteUserById()" class="btn btn-primary btn-block">Delete User By ID</button>
+            <button class="btn btn-primary btn-block" data-url="/users/" data-method="GET">List All Users</button>
+            <button class="btn btn-primary btn-block" data-url="/users/me" data-method="GET">Get Current Logged User</button>
+            <button class="btn btn-primary btn-block" data-url="/users/" data-method="GET" data-user-id="true">Get User by ID</button>
+            <button class="btn btn-primary btn-block" data-url="/users" data-method="GET" data-query="true">Search User By Name</button>
+            <button class="btn btn-primary btn-block" data-url="/users/" data-method="DELETE" data-user-id="true">Delete User By ID</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/" data-method="GET">List All Friendships</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/me" data-method="GET">List My Friendships</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/requests" data-method="GET">List My Friendships Requests</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/requested">List My Friendships Requested</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/" data-method="GET" data-user-id="true">Get My Friendship With User</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/" data-method="POST" data-user-id="true">Invite User</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/" data-method="PUT" data-user-id="true">Accept Invite</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/" data-method="DELETE" data-user-id="true">Reject Invite</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/vip/" data-method="POST" data-user-id="true">Set Friend As Vip</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/vip/" data-method="DELETE" data-user-id="true">Unset Friend As Vip</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/block/" data-method="POST" data-user-id="true">Block Friend</button>
+            <button class="btn btn-primary btn-block" data-url="/friendships/block/" data-method="DELETE" data-user-id="true">Unblock Friend</button>
           </div>
 
           <h2 class="page-header">Login</h2>
+            <div class="well authHolder">
+              <p>Authorization Type</p>
+              <label class="radio-inline">
+                <input type="radio" name="authType" id="cookie" value="cookie" checked> Cookie
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="authType" id="Header" value="header"> Header
+              </label>
+            </div>
           <form class="form-horizontal margin-bottom" id="login" action="/login">
             <div class="form-group">
               <label for="username" class="col-md-2 control-label">User:</label>
@@ -57,7 +79,7 @@
             <div class="form-group">
               <label for="password" class="col-md-2 control-label">Password:</label>
               <div class="col-md-10">
-                <input type="text" name="password" id="password" class="form-control"/>
+                <input type="password" name="password" id="password" class="form-control"/>
               </div>
             </div>
             <button type="submit" class="btn btn-primary pull-right">Log In</button>
@@ -90,20 +112,20 @@
           <h2 class="page-header">Change Password</h2>
           <form class="form-horizontal margin-bottom" id="changePassword" action="/users">
             <div class="form-group">
-              <label for="passwordUserId" class="col-md-4 control-label">User ID:</label>
-              <div class="col-md-8">
+              <label for="passwordUserId" class="col-md-2 control-label">User ID:</label>
+              <div class="col-md-10">
                 <input type="text" name="passwordUserId" id="passwordUserId" class="form-control"/>
               </div>
             </div>
             <div class="form-group">
-              <label for="oldPassword" class="col-md-4 control-label">Old Password:</label>
-              <div class="col-md-8">
+              <label for="oldPassword" class="col-md-2 control-label">Old Pwd:</label>
+              <div class="col-md-10">
                 <input type="password" name="oldPassword" id="oldPassword" class="form-control"/>
               </div>
             </div>
             <div class="form-group">
-              <label for="newPassword" class="col-md-4 control-label">New Password:</label>
-              <div class="col-md-8">
+              <label for="newPassword" class="col-md-2 control-label">New Pwd:</label>
+              <div class="col-md-10">
                 <input type="password" name="newPassword" id="newPassword" class="form-control"/>
               </div>
             </div>
@@ -128,6 +150,8 @@
   <script type="text/javascript" src="lib/js/jquery.cookie.js"></script>
   <script type="application/javascript">
 
+    var token = '';
+
     function makeAjaxCall(url, type, title, data) {
       var options = {
         method: type,
@@ -145,12 +169,19 @@
         }
       };
 
+      if(token && token.length > 0) {
+        options.headers = {
+          Authorization: 'bearer ' + token
+        }
+      }
+
       if(data) {
         options.dataType = 'json';
         options.data = data;
       }
+
       $.ajax(url, options);
-    };
+    }
 
     function makeFormCall(form, event, type, title, url){
       event.preventDefault();
@@ -164,29 +195,20 @@
       makeAjaxCall(url, type, title, data);
     }
 
-    function listAllUsers() {
-      makeAjaxCall('/users', 'GET', 'List All Users');
-    };
+    $('.well').on('click', 'button', function(evt){
+        var button = $(evt.target);
+        var url = button.data('url');
 
-    function getUserById() {
-      makeAjaxCall('/users/' + $('#userId').val(), 'GET', 'Get User By Id');
-    };
+        if(button.data('userId')){
+            url += $('#userId').val();
+        }
 
-    function searchByName() {
-      makeAjaxCall('/users?q=' + $('#queryUserName').val(), 'GET', 'Search User By name');
-    };
+        if(button.data('query')){
+            url += '?q=' + $('#queryUserName').val();
+        }
 
-    function deleteUserById() {
-      makeAjaxCall('/users/' + $('#userId').val(), 'DELETE', 'Delete User By Id');
-    };
-
-    function updatePasswordById() {
-      makeAjaxCall('/users/' + $('#passwordUserId').val() + '/password', 'PUT', 'Update Password By Id');
-    };
-
-    function getMe() {
-      makeAjaxCall('/users/me', 'GET', 'Get Current Logged User');
-    }
+        makeAjaxCall(url, button.data('method'), button.text());
+    });
 
     function logout() {
       if($.removeCookie('socialAPI')) {
@@ -197,7 +219,10 @@
         $('.requestResult').html('Could not remove cookie.');
       }
 
-    };
+      $('.authHolder').show();
+
+      token = '';
+    }
 
     $('#login').submit(function(event){
       event.preventDefault();
@@ -206,12 +231,17 @@
         method: 'POST',
         dataType: 'json',
         data: $(this).serialize(),
-        success: function(token) {
+        success: function(authToken) {
           $('#requester').html('Log In');
-          $('.requestResult').html(token);
+          $('.requestResult').html(authToken);
 
-          $.cookie('socialAPI', token);
+          if($('input[name=authType]:checked').val() === 'cookie') {
+            $.cookie('socialAPI', authToken);
+          } else {
+            token  = authToken;
+          }
 
+          $('.authHolder').hide();
         },
         error:function(request, status, error) {
           alert('An error has occured ' + error + '. Status: ' + status);

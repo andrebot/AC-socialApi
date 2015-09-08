@@ -74,7 +74,7 @@ var FriendshipController = function () {
   };
 
   this.getFriendship = function(request, response) {  	
-	  var token = request.token;
+	var token = request.token;
     var friendId = request.params.friendId;
     var fail = function(error) {
       if(error) {

@@ -18,7 +18,7 @@ router.route('/:userId')
   .get(auth.isAuthenticated, userController.getUser)
   .delete(auth.hasRole('admin'), userController.deleteUser);
 
-router.route('/:userId/password')
+router.route('/password/:userId')
   .put(auth.isAuthenticated, userController.changePassword);
 
 module.exports = router;
