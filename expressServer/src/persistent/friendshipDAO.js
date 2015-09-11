@@ -6,34 +6,18 @@ var _ = require('lodash'),
 
 var FriendshipDAO = function(){
 
-  // Method to parse the response moving the _id.userRequested 
-  // and _id.userRequester to the parent level.
-  var _parseQueryFunction = function(successCB, failCB) {
-    var parse = function(data) {
-      var items = [];
-      _.each(data, function(item) {
-        var json = item.toJSON();
-        json.userRequested = json._id.userRequested;
-        json.userRequester = json._id.userRequester;
-        delete json._id;
-        items.push(json);
-      });
-
-      successCB(items);
-    };
-
-    return _defaultQueryFunction(parse, failCB);
-  };
-
   var _parseMyFriendsQueryFunction = function(userId, successCB, failCB) {
     var parse = function(data) {
       var items = [];
       _.each(data, function(item) {
         var json = item.toJSON(),
-            friend = json._id.userRequested._id == userId ? json._id.userRequester : json._id.userRequested;
+            friend = json.userRequested._id == userId ? json.userRequester : json.userRequested;
 
         json.user = friend;
-        delete json._id;
+
+        delete json.userRequested;
+        delete json.userRequester;
+
         items.push(json);
       });
 
@@ -60,7 +44,7 @@ var FriendshipDAO = function(){
       console.log('Processing ' + data.length + ' friendship ids');
 
       var ids = _.map(data, function(friendship) {
-        return friendship._id.userRequester != userId ? friendship._id.userRequester : friendship._id.userRequested;
+        return friendship.userRequester != userId ? friendship.userRequester : friendship.userRequested;
       });
 
       successCB(ids);
@@ -71,8 +55,8 @@ var FriendshipDAO = function(){
 
   var _defaultQueryFriendshipInOrder  = function(userId, friendId){
     return { 
-     '_id.userRequested': friendId, 
-     '_id.userRequester': userId     
+     'userRequested': friendId, 
+     'userRequester': userId     
     };
   };
 
@@ -93,10 +77,10 @@ var FriendshipDAO = function(){
     return { 
       '$or': [ 
         { 
-          '_id.userRequested': userId          
+          'userRequested': userId          
         },
         {
-          '_id.userRequester': userId 
+          'userRequester': userId 
         } 
       ],
 	  'status' : 1, // Status = accepted(1)
@@ -121,9 +105,9 @@ var FriendshipDAO = function(){
     console.log('MongoDB - List All My Friendships - find()');
     Friendship
       .find(_defaultQueryMyFriendship(userId))
-      .select('_id')
-      .populate('_id.userRequested', 'name email')
-      .populate('_id.userRequester', 'name email')
+      .select('userRequested userRequester')
+      .populate('userRequested', 'name email')
+      .populate('userRequester', 'name email')
       .exec(_parseMyFriendsQueryFunction(userId, successCB, failCB));
   };
 
@@ -132,22 +116,22 @@ var FriendshipDAO = function(){
     
     var query = {
       '$or': [{
-          '_id.userRequested': userId
+          'userRequested': userId
         }, {
-          '_id.userRequester': userId
+          'userRequester': userId
         }
       ]
     };
 
-    Friendship.find(query, '_id', _getAllMyFriendshipIdsQueryFunction(userId, successCB, failCB));
+    Friendship.find(query, 'userRequested userRequester', _getAllMyFriendshipIdsQueryFunction(userId, successCB, failCB));
   };
 
   this.getFriendshipRequested = function(userId, successCB, failCB) {
     console.log('MongoDB - List All Friendships requested by a given user id - find()');
 
-    var handler = _parseQueryFunction(successCB, failCB),
+    var handler = _defaultQueryFunction(successCB, failCB),
         query = {
-          '_id.userRequester': userId,
+          'userRequester': userId,
           'status': 0,
           'blockUserRequested': false,
           'blockUserRequester': false
@@ -155,18 +139,18 @@ var FriendshipDAO = function(){
 
     Friendship
       .find(query)
-      .select('_id')
-      .populate('_id.userRequested', 'name email')
-      .populate('_id.userRequester', 'name email')
+      .select('userRequested userRequester')
+      .populate('userRequested', 'name email')
+      .populate('userRequester', 'name email')
       .exec(handler);
   };
 
   this.getFriendshipRequests = function(userId, successCB, failCB) {
     console.log('MongoDB - List All Friendships requested to a given user id - find()');
 
-    var handler = _parseQueryFunction(successCB, failCB),
+    var handler = _defaultQueryFunction(successCB, failCB),
         query = {
-          '_id.userRequested': userId,
+          'userRequested': userId,
           'status': 0,
           'blockUserRequested': false,
           'blockUserRequester': false
@@ -174,9 +158,9 @@ var FriendshipDAO = function(){
 
     Friendship
       .find(query)
-      .select('_id')
-      .populate('_id.userRequested', 'name email')
-      .populate('_id.userRequester', 'name email')
+      .select('userRequested userRequester')
+      .populate('userRequested', 'name email')
+      .populate('userRequester', 'name email')
       .exec(handler);
   };
 
@@ -285,10 +269,8 @@ var FriendshipDAO = function(){
         }
       }else{
         var newFriendship = new Friendship({ 
-          '_id' :{ 
-            userRequester: new ObjectID(userId),
-            userRequested:  new ObjectID(friendId)
-          }
+          userRequester: new ObjectID(userId),
+          userRequested:  new ObjectID(friendId)
         });
 
         newFriendship.save(function(error){
