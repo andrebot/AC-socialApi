@@ -4,10 +4,8 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 var FriendshipSchema = new Schema({
-  _id: {  
-    userRequested: {type: Schema.ObjectId, ref: 'User'},
-    userRequester: {type: Schema.ObjectId, ref: 'User'}
-  },
+  userRequested: {type: Schema.ObjectId, ref: 'User'},
+  userRequester: {type: Schema.ObjectId, ref: 'User'},
   status: { type: Number, default: 0, min: 0, max: 2},
   blockUserRequested: { type: Boolean, default: false},
   blockUserRequester: { type: Boolean, default: false},
@@ -16,18 +14,18 @@ var FriendshipSchema = new Schema({
 });
 
 FriendshipSchema.methods.CheckIsRequester  = function(userId) {
-  return this._id.userRequester.toString() === userId;
+  return this.userRequester.toString() === userId;
 };
 
 
 FriendshipSchema.methods.CheckIsRequested  = function(userId) {
-  return this._id.userRequested.toString() === userId;
+  return this.userRequested.toString() === userId;
 };
 
 
 FriendshipSchema.methods.CanUpdateStatus  = function(userId, status) {    
   console.log('checking if can update status: ' + userId + ' - status: ' + status);
-  return this._id.userRequested.toString() === userId || status === 0;
+  return this.userRequested.toString() === userId || status === 0;
 };
 
 
@@ -47,6 +45,7 @@ FriendshipSchema
   }, 'Requester User is Blocked');
 
     
+FriendshipSchema.index({ userRequested: 1, userRequester: 1 }, { unique: true });
 
 //FriendshipSchema.set('toJSON', { virtuals: true });
 
