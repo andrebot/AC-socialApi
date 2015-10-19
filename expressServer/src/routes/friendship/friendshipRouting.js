@@ -4,7 +4,7 @@ var express = require('express');
 var router = express.Router();
 
 router.route('/')
-  .get(auth.isAuthenticated, friendshipController.listAllFriendships);
+  .get(auth.isAuthenticated, friendshipController.listMyFriendships);
 
 router.route('/me')
   .get(auth.isAuthenticated, friendshipController.listMyFriendships);
