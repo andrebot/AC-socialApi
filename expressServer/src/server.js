@@ -20,6 +20,7 @@ mongoose.connect(config.mongo.uri, config.mongo.options);
 console.log('Making public folder public...');
 app.use(express.static('../public'));
 app.use('/facember', express.static('../facember'));
+app.use('/facember/*', express.static('../facember'));
 
 console.log('Adding Middlewares...');
 //Adding body-parser as first middleware
