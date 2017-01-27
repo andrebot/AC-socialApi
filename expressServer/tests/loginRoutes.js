@@ -2,6 +2,13 @@ var serverObject = require('../src/server');
 var request = require('supertest');
 var should = require('should');
 var jwt = require('jsonwebtoken');
+var User = require('./../src/schema/user.schema');
+var testData = {
+    email: 'admin@mail.com',
+    password: 'test'
+  }, testUser = new User(testData);
+
+testUser.save();
 
 describe('Login Route', function(){
   var server;
@@ -9,18 +16,21 @@ describe('Login Route', function(){
   var url = 'http://' + serverConfig.host + ':' + serverConfig.port;
   request = request(url);
 
-  beforeEach(function(done){
+  before(function(done){
     server = serverObject.makeServer(done);
   });
 
-  afterEach(function(done){
-    server.close(done);
+  after(function(done){
+    User.findOneAndRemove(testUser._id, function(err, data){
+        console.log('after Login Routes');
+        server.close(done);
+    });
   });
 
   it('should login successfully with right credentials', function(done){
     var user = {
-      username: 'andrebot_almeida@hotmail.com',
-      password: 'theasdf123'
+      username: testUser.email,
+      password: testUser.password
     };
 
     request.post('/login')
@@ -45,13 +55,7 @@ describe('Login Route', function(){
     };
 
     request.post('/login')
-      .send(user)
-      .expect(403)
-      .end(function(error, response){
-        if(error) return done(error);
-
-        done();
-      });
+      .send(user).expect(403, done);
   });
 
 });

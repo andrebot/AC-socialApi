@@ -1,97 +1,106 @@
-var users = [
-  {
-    id: 0,
-    name: 'Andre Botelho Almeida',
-    email: 'andrebot_almeida@hotmail.com',
-    role: 'admin',
-    password: 'theasdf123',
-    provider: 'avenuecode',
-    salt: 'salty',
-    facebook: {},
-    twitter: {},
-    google: {},
-    github: {}
-  },
-  {
-    id: 1,
-    name: 'Bruno Araujo',
-    email: 'brunoaraujo1942@uol.com',
-    role: 'user',
-    password: 'pipoca',
-    provider: 'avenuecode',
-    salt: 'salty',
-    facebook: {},
-    twitter: {},
-    google: {},
-    github: {}
-  }
-];
-
-var User = function(name, email, password) {
-  this.name = name || '';
-  this.email = email || '';
-  this.role = 'user';
-  this.password = password || '';
-  this.provider = 'local';
-  this.salt = '';
-  this.facebook = {};
-  this.twitter = {};
-  this.google = {};
-  this.github= {};
-};
+'use strict';
+var _ = require('lodash'),
+    config = require('../config'),
+    User = require('./../schema/user.schema');
 
 var UserDAO = function(){
 
-  this.getUser = function(id) {
-    return (users.length > id) ? users[id] : {};
-  };
-
-  this.listAllUsers = function() {
-    return users;
-  };
-
-  this.searchUsersByName = function(query) {
-    var regExp = new RegExp(query, 'i');
-    var results = [];
-    for(var x = users.length - 1; x >= 0; x--) {
-      if( regExp.test(users[x].name) ) {
-        results.push(users[x]);
+  var _defaultQueryFunction = function(successCB, failCB){
+    var defaultFunction = function(error, data){
+      if(data && !error) {
+        successCB(data);
+      } else {
+        failCB(error, data);
       }
-    }
+    };
 
-    return results;
+    return defaultFunction;
   };
 
-  this.getUserByEmailAndPassword = function(email, password) {
-    for(var x = users.length - 1; x >= 0; x--) {
-      if(users[x].email === email && users[x].password === password){
-        return users[x];
+  this.getUser = function(id, successCB, failCB) {
+    console.log('MongoDB - Get User - findById(' + id + ')');
+    User.findById(id, _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.listAllUsers = function(successCB, failCB) {
+    console.log('MongoDB - List All Users - findById()');
+    User.find({}, _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.listUsersById = function(usersIds, successCB, failCB) {
+    console.log('MongoDB - List Users by IDs - find()');
+    User.find({ _id: { $in: usersIds}}, _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.searchUsersByName = function(query, successCB, failCB) {
+    console.log('MongoDB - Search users by name - find() by query');
+    var querystring = query || '',
+    searchRegExp = new RegExp('.*' + querystring + '.*', 'i'),
+    criteria = {
+       $or: [ 
+        { name: searchRegExp }, 
+        { email: searchRegExp } 
+      ]
+    };
+	User.find(criteria, _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.getUserByEmailAndPassword = function(userData, successCB, failCB) {
+    console.log('MongoDB - Get User by Email and Password - findOne() by email: ' + userData.username + ' and password: ' + userData.password);
+    User.findOne({ email: userData.username, password: userData.password}, _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.changePassword = function(userData, successCB, failCB) {
+    console.log('MongoDB - changePassword - findOneAndUpdate()');
+    User.findOneAndUpdate({ '_id': userData._id, 'password': userData.oldPassword },
+                          { $set: { password: userData.newPassword } },
+                          { 'new': true },
+                          _defaultQueryFunction(successCB, failCB));
+  };
+
+  this.createUser = function(userData, successCB, failCB){
+    var newUser = new User({ name: userData.name,
+                             email: userData.email,
+                             password: userData.password});
+
+    newUser.provider = 'local';
+    newUser.role = 'user';
+    newUser.save(function(error){
+      if(error) {
+        failCB(error);
+      } else {
+        console.log('Mongoose - Schema - User created');
+        successCB(newUser);
       }
-    }
-
-    return null;
+    });
   };
 
-  this.changePassword = function(userId, oldPassword, newPassword) {
-    var user = users[userId];
+  this.updateUser = function(id, userData, successCB, failCB) {
+    userData = _.pick(userData, ['name', 'email']);
 
-    if(user && user.password === oldPassword) {
-      user.password = newPassword;
-    }
-
-    return user;
+    console.log('MongoDB - updateUser - findOneAndUpdate()');
+    User.findOneAndUpdate({ '_id': id },
+                          { $set: userData },
+                          { 'new': true },
+                          _defaultQueryFunction(successCB, failCB));
   };
 
-  this.createUser = function(name, email, password){
-    var newUser = new User(name, email, password);
-    newUser.id = users.length;
-    users.push(newUser);
+  this.getAvailableFriends = function(userId, friendshipUserIds, successCB, failCB) {
+    console.log('MongoDB - Get Available Users - find()');
 
-    return newUser;
+    var invalidUserIds = _.clone(friendshipUserIds);
+    invalidUserIds.push(userId);
+    
+    User
+      .find({ _id: { $nin: invalidUserIds}})
+      .select('name email')
+      .limit(config.availableFriendsLimit).
+      exec(_defaultQueryFunction(successCB, failCB));
   };
 
-  this.deleteUser = function(userId) {
-    return  (users.length > userId) ? users.splice(userId, 1)[0] : {};
+  this.deleteUser = function(userId, successCB, failCB) {
+    console.log('MongoDB - User deleted - findOneAndRemove(' + userId + ')');
+    User.findOneAndRemove(userId, _defaultQueryFunction(successCB, failCB));
   };
 };
 
